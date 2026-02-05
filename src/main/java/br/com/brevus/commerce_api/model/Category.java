@@ -6,31 +6,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "categories")
 @Getter
 @Setter
-@Table(name = "user_roles")
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserRole {
+@NoArgsConstructor
+public class Category {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "role_user_id")
-    private User user;
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
-
-    public UserRole(User user, Role role){
-        this.user = user;
-        this.role= role;
-    }
-
+    @OneToMany(mappedBy = "category")
+    private List<Product> products;
 }

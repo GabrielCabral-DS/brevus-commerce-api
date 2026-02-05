@@ -35,7 +35,6 @@ public class User {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateRegistered;
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UserRole> userRoles;
 }

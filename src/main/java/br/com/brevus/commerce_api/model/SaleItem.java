@@ -6,31 +6,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
+@Table(name = "sale_items")
 @Getter
 @Setter
-@Table(name = "user_roles")
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserRole {
+@NoArgsConstructor
+public class SaleItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "role_user_id")
-    private User user;
+    @JoinColumn(name = "sale_id")
+    private Sale sale;
 
     @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    public UserRole(User user, Role role){
-        this.user = user;
-        this.role= role;
-    }
-
+    private Integer quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal subtotal;
 }
+

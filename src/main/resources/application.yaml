@@ -1,3 +1,52 @@
 spring:
   application:
     name: commerce-api
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+#      ddl-auto: update # Recomendo deixar update enquanto desenvolve
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${ENVIO_EMAIL_USERNAME}
+    password: ${ENVIO_EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+
+springdoc:
+  override-with-generic-response: false
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.orm.connections.pooling: WARN
+    org.springframework.web: DEBUG
+    org.springframework.security: TRACE
+  pattern:
+    console: '%clr(%d{dd-MM-yyyy HH:mm:ss}){blue} %clr(%5p) %clr([%t]){faint} %clr(%-40.40logger){cyan} %clr(:){yellow} %m%n'

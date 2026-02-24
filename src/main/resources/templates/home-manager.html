@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Brevus Commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex transition-colors duration-300">
+
+<aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="p-6 flex items-center gap-3">
+        <div class="bg-indigo-600 p-2 rounded-lg text-white">
+            <i class="fa-solid fa-gears"></i>
+        </div>
+        <span class="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-wider">Admin<span class="text-indigo-600">API</span></span>
+    </div>
+
+    <nav class="flex-1 px-4 space-y-2 mt-4">
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold">
+            <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-box w-5"></i> Produtos
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-cart-shopping w-5"></i> Vendas
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-users w-5"></i> Clientes
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-layer-group w-5"></i> Categorias
+        </a>
+    </nav>
+
+    <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+        <button id="theme-toggle" class="w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700">
+            <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
+            <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
+            <span class="text-sm font-medium">Alternar Tema</span>
+        </button>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-y-auto">
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 sticky top-0 z-10 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white">Visão Geral</h2>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p class="text-sm font-bold text-slate-800 dark:text-white">Admin Master</p>
+                <p class="text-xs text-green-500 font-medium">Sistema Online</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold">A</div>
+        </div>
+    </header>
+
+    <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 rounded-xl">
+                        <i class="fa-solid fa-money-bill-trend-up text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold text-green-500 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded">+12%</span>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Faturamento Total</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1">R$ <span th:text="${totalFaturamento}">45.230,00</span></h3>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl">
+                        <i class="fa-solid fa-box-archive text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Produtos em Estoque</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1" th:text="${totalProdutos}">1.240</h3>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-amber-100 dark:bg-amber-900/50 text-amber-600 rounded-xl">
+                        <i class="fa-solid fa-spinner text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Vendas Pendentes</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1" th:text="${vendasPendentes}">18</h3>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-green-100 dark:bg-green-900/50 text-green-600 rounded-xl">
+                        <i class="fa-solid fa-building-columns text-xl"></i>
+                    </div>
+                    <span class="flex h-2 w-2 rounded-full bg-green-500 animate-ping"></span>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Gateway Efí Bank</p>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white mt-1">Conectado</h3>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Últimas Vendas (Integração Webhook)</h3>
+                <button class="text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:underline">Ver todas</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr class="bg-slate-50 dark:bg-slate-700/50">
+                        <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Cliente</th>
+                        <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Valor</th>
+                        <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">TXID (Efí)</th>
+                        <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                        <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                    <tr th:each="venda : ${vendas}" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                        <td class="p-4">
+                            <p class="font-bold text-slate-800 dark:text-white text-sm">João Silva</p>
+                            <p class="text-xs text-slate-500">joao@email.com</p>
+                        </td>
+                        <td class="p-4 font-medium text-slate-700 dark:text-slate-300 text-sm">R$ 599,00</td>
+                        <td class="p-4 text-xs font-mono text-slate-500 dark:text-slate-400">79af8c...221</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">PAGO</span>
+                        </td>
+                        <td class="p-4">
+                            <button class="text-slate-400 hover:text-indigo-600"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="p-4">
+                            <p class="font-bold text-slate-800 dark:text-white text-sm">Maria Souza</p>
+                            <p class="text-xs text-slate-500">maria@email.com</p>
+                        </td>
+                        <td class="p-4 font-medium text-slate-700 dark:text-slate-300 text-sm">R$ 1.250,00</td>
+                        <td class="p-4 text-xs font-mono text-slate-500 dark:text-slate-400">44bc12...90a</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase leading-none">Aguardando PIX</span>
+                        </td>
+                        <td class="p-4">
+                            <button class="text-slate-400 hover:text-indigo-600"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        themeToggleLightIcon.classList.remove('hidden');
+    } else {
+        document.documentElement.classList.remove('dark');
+        themeToggleDarkIcon.classList.remove('hidden');
+    }
+
+    themeToggleBtn.addEventListener('click', function() {
+        themeToggleDarkIcon.classList.toggle('hidden');
+        themeToggleLightIcon.classList.toggle('hidden');
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('color-theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+        }
+    });
+</script>
+</body>
+</html>

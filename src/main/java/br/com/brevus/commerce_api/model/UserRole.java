@@ -1,19 +1,12 @@
 package br.com.brevus.commerce_api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "user_roles")
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserRole {
 
     @Id
@@ -28,9 +21,42 @@ public class UserRole {
     @JoinColumn(name = "role_id")
     private Role role;
 
+
+    public UserRole() {
+    }
+
+    public UserRole(UUID id, User user, Role role) {
+        this.id = id;
+        this.user = user;
+        this.role = role;
+    }
+
     public UserRole(User user, Role role){
         this.user = user;
         this.role= role;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }

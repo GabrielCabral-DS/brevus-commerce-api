@@ -1,8 +1,10 @@
 package br.com.brevus.commerce_api.controller;
 
 
+import br.com.brevus.commerce_api.dto.LoginRequestDTO;
 import br.com.brevus.commerce_api.dto.UserRequestDTO;
 import br.com.brevus.commerce_api.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,14 +17,22 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/register-user")
     public ResponseEntity<Void> register(@RequestBody @Valid UserRequestDTO dto){
-        userService.register(dto);
+        userService.registerUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "Login", description = "Login para obter o token JWT.")
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        String token = userService.login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+        return ResponseEntity.ok(token);
     }
 
     @GetMapping

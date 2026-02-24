@@ -1,12 +1,12 @@
 package br.com.brevus.commerce_api.repository;
 
-import br.com.brevus.commerce_api.model.User;
+import br.com.brevus.commerce_api.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface RoleRepository extends JpaRepository<Role, UUID> {
 
-    Optional<User> findByEmail(String email);
+    Optional<Role> findByName(String name);
 }

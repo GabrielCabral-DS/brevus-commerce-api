@@ -1,12 +1,15 @@
 package br.com.brevus.commerce_api.security;
 
+import br.com.brevus.commerce_api.dto.JwtResponse;
 import br.com.brevus.commerce_api.dto.UserRequestDTO;
-import br.com.brevus.commerce_api.mapper.UserMapper;
+import br.com.brevus.commerce_api.model.RefreshToken;
 import br.com.brevus.commerce_api.model.User;
 import br.com.brevus.commerce_api.repository.UserRepository;
-import br.com.brevus.commerce_api.repository.UserRoleRepository;
-import br.com.brevus.commerce_api.service.JwtTokenService;
-import br.com.brevus.commerce_api.service.UserService;
+import br.com.brevus.commerce_api.service.AuthService;
+import br.com.brevus.commerce_api.service.JwtService;
+import br.com.brevus.commerce_api.service.LoginHistoryService;
+import br.com.brevus.commerce_api.service.RefreshTokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,55 +20,103 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class LoginSocialSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class LoginSocialSuccessHandler
+        extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-    private final UserService userService;
-    private final JwtTokenService jwtTokenService;
-    private final UserRoleRepository userRoleRepository;
-    private final UserMapper userMapper;
+    private final JwtService jwtService;
+    private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
+    private final LoginHistoryService loginHistoryService;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) throws IOException {
 
-        OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
+        OAuth2AuthenticationToken oauth2Token =
+                (OAuth2AuthenticationToken) authentication;
+
         OAuth2User oauth2User = oauth2Token.getPrincipal();
+
         String email = oauth2User.getAttribute("email");
 
         if (email == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email não fornecido pelo provedor OAuth2.");
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "Email não fornecido pelo provedor OAuth2."
+            );
             return;
         }
 
-        userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    User user = new User();
-                    user.setName(oauth2User.getAttribute("name"));
-                    user.setEmail(email);
-                    user.setPhone("(11) 98765-4321");
-                    user.setPassword(UUID.randomUUID().toString());
-
-                    UserRequestDTO dto = userMapper.toDTO(user);
-
-                    return userService.registerUser(dto);
-                });
-
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseGet(() -> registerSocialUser(oauth2User));
 
-        String userRole = String.valueOf(userRoleRepository.findRoleNamesByUserId(user.getId()));
+        CustomUserDetails userDetails =
+                new CustomUserDetails(user);
 
-        String token = jwtTokenService.generateTokenLogin(user.getId(),user.getName(),userRole,user.getEmail());
+        String accessToken = jwtService.generateToken(userDetails);
+        RefreshToken refreshToken =
+                refreshTokenService.create(user.getId());
 
-        response.setContentType("application/json");
+        loginHistoryService.save(userDetails, accessToken);
+
+        JwtResponse jwtResponse = new JwtResponse(accessToken, refreshToken.getToken());
+
+        // Retornar HTML com JavaScript que armazena os tokens e redireciona
+        response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"token\":\"" + token + "\"}");
+
+        String html = "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "    <meta charset='UTF-8'>" +
+                "    <title>Autenticando...</title>" +
+                "    <script src='/js/auth-utils.js'></script>" +
+                "</head>" +
+                "<body>" +
+                "    <script>" +
+                "        const tokens = " + objectMapper.writeValueAsString(jwtResponse) + ";" +
+                "        AuthUtils.setTokens(tokens.accessToken, tokens.refreshTokenToken);" +
+                "        AuthUtils.redirectByRole();" +
+                "    </script>" +
+                "</body>" +
+                "</html>";
+
+        response.getWriter().write(html);
         response.getWriter().flush();
     }
+
+    private User registerSocialUser(OAuth2User oauth2User) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        UserRequestDTO dto = new UserRequestDTO(
+                UUID.randomUUID(),
+                oauth2User.getAttribute("name"),
+                oauth2User.getAttribute("email"),
+                UUID.randomUUID().toString(),
+                "(00) 00000-0000",
+                LocalDate.parse("22/02/1990", formatter),
+                LocalDate.parse("20/02/2026", formatter)
+
+        );
+
+        authService.registerUser(dto);
+
+        return userRepository.findByEmail(dto.email())
+                .orElseThrow();
+    }
 }
+
+
+

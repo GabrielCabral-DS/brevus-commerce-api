@@ -1,19 +1,19 @@
 package br.com.brevus.commerce_api.config;
 
-import br.com.brevus.commerce_api.security.JwtTokenFilter;
+import br.com.brevus.commerce_api.security.JwtAuthenticationFilter;
+import br.com.brevus.commerce_api.security.LoginSocialSuccessHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -23,51 +23,64 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
+    private final JwtAuthenticationFilter jwtFilter;
+
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtTokenFilter jwtTokenFilter) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           LoginSocialSuccessHandler successHandler) throws Exception {
 
-        return http
-                .formLogin(AbstractHttpConfigurer::disable)
+        http
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/",
                                 "/login",
-                                "/api/users/register-employee",
-                                "/api/users/register-manager",
-                                "/api/users/register-user",
-                                "/api/users/login",
+                                "/api/web/register-user",
+                                "/api/web/reset-password",
+                                "/api/web/email-password",
+                                "/api/web/home-user",
+                                "/api/web/home-manager",
+                                "/api/web/login",
+                                "/api/web/oauth2-callback",
+                                "/api/users/reset-password",
                                 "/api/users/recover-password",
-                                "/api/position/list/{departmentId}",
-                                "/api/subsidiary-company/enterprise/{id}",
-                                "/api/web/**",
+                                "/api/users/login",
+                                "/api/users/register-user",
+                                "/api/users/refresh-token",
+                                "/",
+                                "/js/**",
+                                "/css/**",
                                 "/images/**",
-                                "/auth/**",
-                                "/oauth2/**",
-                                "/v2/api-docs/**",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
+                                "/static/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/webjars/**"
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/auth/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .oauth2Login(oauth2 -> oauth2.successHandler(successHandler))
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
+        return http.build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 }

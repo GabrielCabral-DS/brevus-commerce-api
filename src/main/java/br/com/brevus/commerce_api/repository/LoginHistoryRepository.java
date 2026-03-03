@@ -1,0 +1,9 @@
+package br.com.brevus.commerce_api.repository;
+
+import br.com.brevus.commerce_api.model.LoginHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.UUID;
+
+public interface LoginHistoryRepository extends JpaRepository<LoginHistory, UUID> {
+}

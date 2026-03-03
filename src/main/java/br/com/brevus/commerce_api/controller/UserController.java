@@ -1,8 +1,9 @@
 package br.com.brevus.commerce_api.controller;
 
 
-import br.com.brevus.commerce_api.dto.LoginRequestDTO;
-import br.com.brevus.commerce_api.dto.UserRequestDTO;
+import br.com.brevus.commerce_api.dto.*;
+import br.com.brevus.commerce_api.service.AuthService;
+import br.com.brevus.commerce_api.service.JwtService;
 import br.com.brevus.commerce_api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -21,18 +22,39 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/register-user")
     public ResponseEntity<Void> register(@RequestBody @Valid UserRequestDTO dto){
-        userService.registerUser(dto);
+        authService.registerUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Login para obter o token JWT.")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        String token = userService.login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-        return ResponseEntity.ok(token);
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        JwtResponse response = authService.login(loginRequestDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    @Operation(summary = "RefreshToken", description = "RefreshToken para obter o token para continuar navegando")
+    public ResponseEntity<JwtResponse> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO){
+        JwtResponse response = authService.refreshToken(refreshTokenRequestDTO);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Recover Password", description = "generate a new jwt token")
+    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPasswordRequestDTO dto){
+        authService.sendRecoveryEmail(dto.email());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/recover-password")
+    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPasswordEmailRequestDTO dto){
+        userService.passwordRecover(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping

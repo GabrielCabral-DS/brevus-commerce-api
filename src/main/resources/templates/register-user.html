@@ -104,12 +104,19 @@
     submitBtn.textContent = 'Cadastrando...';
     errorMessage.classList.add('hidden');
 
+    // Remover não-dígitos do telefone
+    const phone = phoneInput.value.replace(/\D/g, '');
+
+    // Data atual para dateRegistered
+    const today = new Date().toISOString().split('T')[0];
+
     const payload = {
       name: nameInput.value,
       email: emailInput.value,
-      phone: phoneInput.value,
+      phone: phone,
       dateBirth: dateBirthInput.value,
-      password: passwordInput.value
+      password: passwordInput.value,
+      dateRegistered: today
     };
 
     console.log('Enviando cadastro com payload:', payload);

@@ -1,4 +1,4 @@
-package br.com.brevus.commerce_api.config;
+package br.com.brevus.commerce_api.controller;
 
 
 import lombok.RequiredArgsConstructor;
@@ -7,12 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class WebConfigurationController {
+public class WebController {
 
-    @GetMapping("/")
-    public String redirectToLogin(){
-        return "redirect:/api/web/login";
-    }
 
     @GetMapping("/login")
     public String loginPage(){
@@ -22,6 +18,21 @@ public class WebConfigurationController {
     @GetMapping("/api/web/login")
     public String loginUserPage(){
         return "login";
+    }
+
+    @GetMapping("api/web/email-password")
+    public String recoverPassword(){
+        return "email-password";
+    }
+
+    @GetMapping("api/web/reset-password")
+    public String resetPasswrod(){
+        return "reset-password";
+    }
+
+    @GetMapping("/api/web/oauth2-callback")
+    public String oauth2CallbackPage(){
+        return "oauth2-callback";
     }
 
     @GetMapping("/api/web/home-user")

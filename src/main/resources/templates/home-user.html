@@ -5,8 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | Brevus Commerce</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/auth-utils.js"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
+
+        // Verificar autenticação no carregamento da página
+        if (!AuthUtils.isAuthenticated()) {
+            window.location.href = '/api/web/login';
+        } else {
+            // Verificar se é CLIENT, senão redirecionar
+            if (!AuthUtils.hasRole('CLIENT')) {
+                window.location.href = '/api/web/home-manager';
+            }
+        }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -35,17 +46,48 @@
                     <div class="flex items-center gap-3">
                         <div class="text-right hidden lg:block">
                             <p class="text-xs text-slate-500 dark:text-slate-400">Bem-vindo,</p>
-                            <p class="text-sm font-bold text-slate-800 dark:text-white" th:text="${userName}">Cliente Brevus</p>
+                            <p class="text-sm font-bold text-slate-800 dark:text-white" id="userName">Cliente Brevus</p>
                         </div>
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold border-2 border-indigo-500">
-                            C
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold border-2 border-indigo-500 cursor-pointer hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors" id="userMenu" title="Menu do usuário">
+                            <span id="userInitial">C</span>
                         </div>
+                    </div>
+
+                    <!-- Menu do usuário -->
+                    <div id="userDropdown" class="hidden absolute top-16 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50">
+                        <button onclick="AuthUtils.logout()" class="w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-sign-out-alt"></i> Logout
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </nav>
+
+<script>
+    // Mostrar nome do usuário
+    const userInfo = AuthUtils.getUserInfo();
+    if (userInfo && userInfo.name) {
+        document.getElementById('userName').textContent = userInfo.name;
+        document.getElementById('userInitial').textContent = userInfo.name.charAt(0).toUpperCase();
+    }
+
+    // Toggle menu do usuário
+    document.getElementById('userMenu').addEventListener('click', function() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('hidden');
+    });
+
+    // Fechar menu quando clicar fora
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('userDropdown');
+        const userMenu = document.getElementById('userMenu');
+        if (!userMenu.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>
 
 <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="bg-gradient-to-r from-indigo-600 to-violet-700 rounded-3xl p-8 text-white shadow-2xl shadow-indigo-200 dark:shadow-none relative overflow-hidden">

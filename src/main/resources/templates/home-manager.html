@@ -5,8 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin | Brevus Commerce</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/auth-utils.js"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
+
+        // Verificar autenticação no carregamento da página
+        if (!AuthUtils.isAuthenticated()) {
+            window.location.href = '/api/web/login';
+        } else {
+            // Verificar se é ADMIN, senão redirecionar
+            if (!AuthUtils.hasRole('ADMIN')) {
+                window.location.href = '/api/web/home-user';
+            }
+        }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -52,12 +63,46 @@
         <h2 class="text-xl font-bold text-slate-800 dark:text-white">Visão Geral</h2>
         <div class="flex items-center gap-4">
             <div class="text-right">
-                <p class="text-sm font-bold text-slate-800 dark:text-white">Admin Master</p>
+                <p class="text-sm font-bold text-slate-800 dark:text-white" id="adminName">Admin Master</p>
                 <p class="text-xs text-green-500 font-medium">Sistema Online</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold">A</div>
+            <div class="relative">
+                <div id="adminMenu" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors" title="Menu do admin">
+                    <span id="adminInitial">A</span>
+                </div>
+                <!-- Menu do admin -->
+                <div id="adminDropdown" class="hidden absolute top-12 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 min-w-[200px]">
+                    <button onclick="AuthUtils.logout()" class="w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
+
+    <script>
+        // Mostrar nome do admin
+        const adminInfo = AuthUtils.getUserInfo();
+        if (adminInfo && adminInfo.name) {
+            document.getElementById('adminName').textContent = adminInfo.name;
+            document.getElementById('adminInitial').textContent = adminInfo.name.charAt(0).toUpperCase();
+        }
+
+        // Toggle menu do admin
+        document.getElementById('adminMenu').addEventListener('click', function() {
+            const dropdown = document.getElementById('adminDropdown');
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Fechar menu quando clicar fora
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('adminDropdown');
+            const adminMenu = document.getElementById('adminMenu');
+            if (!adminMenu.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
 
     <div class="p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

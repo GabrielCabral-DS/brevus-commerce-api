@@ -12,6 +12,7 @@
     }
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="/js/auth-utils.js"></script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 flex items-center justify-center min-h-screen transition-colors duration-300">
 
@@ -81,7 +82,7 @@
       <a href="/api/web/register-user" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">Cadastre-se</a>
     </p>
     <p>
-      <a href="#" class="text-xs text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-slate-300 underline-offset-4">Esqueceu a senha?</a>
+      <a href="/api/web/email-password" class="text-xs text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-slate-300 underline-offset-4">Esqueceu a senha?</a>
     </p>
   </div>
 </div>
@@ -114,23 +115,18 @@
       });
 
       if (response.ok) {
-        const token = await response.text();
-        // Armazenar o token no localStorage
-        localStorage.setItem('authToken', token);
+        const data = await response.json();
+
+        // Armazenar os tokens usando AuthUtils
+        AuthUtils.setTokens(data.accessToken, data.refreshTokenToken);
 
         // Decodificar o JWT para pegar as roles
-        const roles = decodeTokenAndGetRoles(token);
+        const roles = AuthUtils.getRolesFromToken(data.accessToken);
         console.log('Roles do usuário:', roles);
+        console.log('Usuário info:', AuthUtils.getUserInfo());
 
         // Redirecionar baseado na role
-        let redirectUrl = '/api/web/home-user'; // Default
-        if (roles.includes('ADMIN')) {
-          redirectUrl = '/api/web/home-manager';
-        } else if (roles.includes('CLIENT')) {
-          redirectUrl = '/api/web/home-user';
-        }
-
-        window.location.href = redirectUrl;
+        AuthUtils.redirectByRole();
       } else {
         const errorText = await response.text();
         showError('Email ou senha incorretos');
@@ -149,55 +145,6 @@
     errorMessage.classList.remove('hidden');
   }
 
-  // Função para decodificar JWT e extrair as roles
-  function decodeTokenAndGetRoles(token) {
-    try {
-      // O JWT tem 3 partes separadas por ponto: header.payload.signature
-      const parts = token.split('.');
-
-      if (parts.length !== 3) {
-        console.error('Token inválido');
-        return [];
-      }
-
-      // Decodificar a parte payload (segunda parte)
-      const payload = parts[1];
-
-      // Adicionar padding se necessário
-      const padding = 4 - (payload.length % 4);
-      const paddedPayload = padding < 4 ? payload + '='.repeat(padding) : payload;
-
-      // Decodificar de Base64
-      const decodedPayload = atob(paddedPayload);
-
-      // Converter para objeto JSON
-      const claims = JSON.parse(decodedPayload);
-
-      console.log('Token decodificado:', claims);
-
-      // Extrair as roles (podem estar em diferentes nomes: 'roles', 'authorities', 'role', etc)
-      let roles = claims.roles || claims.authorities || claims.role || [];
-
-      // Se roles é uma string, precisa converter
-      if (typeof roles === 'string') {
-        // Remover colchetes se existirem: "[ADMIN]" -> "ADMIN"
-        roles = roles.replace(/[\[\]]/g, '');
-        // Dividir por vírgula e espaço em branco: "ADMIN,CLIENT" -> ["ADMIN", "CLIENT"]
-        roles = roles.split(',').map(r => r.trim()).filter(r => r.length > 0);
-      }
-
-      // Garantir que é um array
-      if (!Array.isArray(roles)) {
-        roles = [roles];
-      }
-
-      console.log('Roles processadas:', roles);
-      return roles;
-    } catch (error) {
-      console.error('Erro ao decodificar token:', error);
-      return [];
-    }
-  }
 
   const themeToggleBtn = document.getElementById('theme-toggle');
   const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');

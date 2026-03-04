@@ -35,17 +35,15 @@
         <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold">
             <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+        <a href="/api/web/products" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
             <i class="fa-solid fa-box w-5"></i> Produtos
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-            <i class="fa-solid fa-cart-shopping w-5"></i> Vendas
-        </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+
+        <a href="/api/web/clients" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
             <i class="fa-solid fa-users w-5"></i> Clientes
         </a>
         <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-            <i class="fa-solid fa-layer-group w-5"></i> Categorias
+            <i class="fa-solid fa-layer-group w-5"></i> Vendas
         </a>
     </nav>
 
@@ -133,7 +131,7 @@
                         <i class="fa-solid fa-spinner text-xl"></i>
                     </div>
                 </div>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Vendas Pendentes</p>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Vendas Realizadas</p>
                 <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1" th:text="${vendasPendentes}">18</h3>
             </div>
 
@@ -151,7 +149,7 @@
 
         <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
             <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Últimas Vendas (Integração Webhook)</h3>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Últimas Vendas Realizadas</h3>
                 <button class="text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:underline">Ver todas</button>
             </div>
             <div class="overflow-x-auto">

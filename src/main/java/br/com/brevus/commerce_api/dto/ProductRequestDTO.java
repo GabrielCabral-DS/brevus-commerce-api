@@ -22,6 +22,9 @@ public record ProductRequestDTO(
         @Min(value = 0, message = "Stock cannot be negative.")
         Integer stockQuantity,
 
+        @NotBlank(message = "The product image is required")
+        String imagePath,
+
         @NotNull(message = "Category ID is required.")
         UUID categoryId
 ) {

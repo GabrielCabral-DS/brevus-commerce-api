@@ -23,6 +23,12 @@ public class Sale {
 
     private BigDecimal totalAmount;
 
+    @Column(length = 50)
+    private String deliveryStatus;
+
+    @Column(length = 100)
+    private String trackingCode;
+
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
@@ -30,6 +36,10 @@ public class Sale {
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private User seller;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_address_id")
+    private Address deliveryAddress;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleItem> items;
@@ -40,13 +50,16 @@ public class Sale {
     public Sale() {
     }
 
-    public Sale(UUID id, LocalDateTime saleDate, SaleStatus status, BigDecimal totalAmount, User client, User seller, List<SaleItem> items, Payment payment) {
+    public Sale(UUID id, LocalDateTime saleDate, SaleStatus status, BigDecimal totalAmount, String deliveryStatus, String trackingCode, User client, User seller, Address deliveryAddress, List<SaleItem> items, Payment payment) {
         this.id = id;
         this.saleDate = saleDate;
         this.status = status;
         this.totalAmount = totalAmount;
+        this.deliveryStatus = deliveryStatus;
+        this.trackingCode = trackingCode;
         this.client = client;
         this.seller = seller;
+        this.deliveryAddress = deliveryAddress;
         this.items = items;
         this.payment = payment;
     }
@@ -83,6 +96,22 @@ public class Sale {
         this.totalAmount = totalAmount;
     }
 
+    public String getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
+    public String getTrackingCode() {
+        return trackingCode;
+    }
+
+    public void setTrackingCode(String trackingCode) {
+        this.trackingCode = trackingCode;
+    }
+
     public User getClient() {
         return client;
     }
@@ -97,6 +126,14 @@ public class Sale {
 
     public void setSeller(User seller) {
         this.seller = seller;
+    }
+
+    public Address getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(Address deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
     public List<SaleItem> getItems() {

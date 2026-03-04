@@ -1,12 +1,10 @@
 package br.com.brevus.commerce_api.controller;
 
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@RequiredArgsConstructor
 public class WebController {
 
 
@@ -18,6 +16,16 @@ public class WebController {
     @GetMapping("/api/web/login")
     public String loginUserPage(){
         return "login";
+    }
+
+    @GetMapping("/api/web/products")
+    public String products(){
+        return "products";
+    }
+
+    @GetMapping("/api/web/clients")
+    public String clients(){
+        return "clients";
     }
 
     @GetMapping("api/web/email-password")

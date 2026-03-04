@@ -38,6 +38,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UserRole> userRoles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         dateRegistered = LocalDate.now();
@@ -46,7 +49,7 @@ public class User {
     public User() {
     }
 
-    public User(UUID id, String name, String email, String password, String phone, LocalDate dateBirth, LocalDate dateRegistered, List<UserRole> userRoles) {
+    public User(UUID id, String name, String email, String password, String phone, LocalDate dateBirth, LocalDate dateRegistered, List<UserRole> userRoles, List<Address> addresses) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -55,6 +58,7 @@ public class User {
         this.dateBirth = dateBirth;
         this.dateRegistered = dateRegistered;
         this.userRoles = userRoles;
+        this.addresses = addresses;
     }
 
     public UUID getId() {
@@ -119,5 +123,13 @@ public class User {
 
     public void setUserRoles(List<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
     }
 }

@@ -3,11 +3,9 @@ package br.com.brevus.commerce_api.controller;
 
 import br.com.brevus.commerce_api.dto.*;
 import br.com.brevus.commerce_api.service.AuthService;
-import br.com.brevus.commerce_api.service.JwtService;
 import br.com.brevus.commerce_api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +15,16 @@ import java.util.UUID;
 
 @RequestMapping("/api/users")
 @RestController
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
 
     private final UserService userService;
     private final AuthService authService;
+
+    public UserController(UserService userService, AuthService authService) {
+        this.userService = userService;
+        this.authService = authService;
+    }
 
     @PostMapping("/register-user")
     public ResponseEntity<Void> register(@RequestBody @Valid UserRequestDTO dto){

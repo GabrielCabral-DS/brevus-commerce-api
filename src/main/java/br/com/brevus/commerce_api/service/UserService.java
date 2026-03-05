@@ -2,9 +2,14 @@ package br.com.brevus.commerce_api.service;
 
 import br.com.brevus.commerce_api.dto.RecoverPasswordEmailRequestDTO;
 import br.com.brevus.commerce_api.dto.UserRequestDTO;
+import br.com.brevus.commerce_api.dto.UsersResponseDTO;
 import br.com.brevus.commerce_api.mapper.UserMapper;
 import br.com.brevus.commerce_api.model.User;
 import br.com.brevus.commerce_api.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +32,10 @@ public class UserService {
     }
 
 
-    public UserRequestDTO getUserById(UUID id){
+    public UsersResponseDTO getUserById(UUID id){
         User user = userRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("User not found"));
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     public UserRequestDTO getUserByEmail(String email){
@@ -39,9 +44,9 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    public List<UserRequestDTO> listAllUsers(){
-        List<User> userRequestDTOS = userRepository.findAll();
-        return userMapper.toDtoList(userRequestDTOS);
+    public List<UsersResponseDTO> listAllUsers(){
+        List<User> userList = userRepository.findAll();
+        return userMapper.toDtoList(userList);
     }
 
     public User updateUsers(UUID id, UserRequestDTO dto){
@@ -84,5 +89,25 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(dto.password()));
         userRepository.save(user);
+    }
+
+    public Page<UsersResponseDTO> getRecentUsers(int page, int size, String search){
+        int adjustedPage = Math.max(0, page);
+
+        Pageable pageable = PageRequest.of(
+                adjustedPage,
+                size,
+                Sort.by(Sort.Direction.DESC,"dateRegistered")
+        );
+
+        Page<User> userPage;
+        if (search != null && !search.trim().isEmpty()) {
+            userPage = userRepository.findByRoleAndSearch(
+                    "CLIENT", search, pageable);
+        } else {
+            userPage = userRepository.findByUserRoles_Role_Name("CLIENT", pageable);
+        }
+
+        return userPage.map(userMapper::toDto);
     }
 }

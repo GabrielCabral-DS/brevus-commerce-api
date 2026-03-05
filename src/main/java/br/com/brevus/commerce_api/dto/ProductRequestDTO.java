@@ -18,6 +18,8 @@ public record ProductRequestDTO(
         @Digits(integer = 10, fraction = 2, message = "Price must have a maximum of 2 decimal places.")
         BigDecimal price,
 
+        String description,
+
         @NotNull(message = "Stock quantity is required.")
         @Min(value = 0, message = "Stock cannot be negative.")
         Integer stockQuantity,

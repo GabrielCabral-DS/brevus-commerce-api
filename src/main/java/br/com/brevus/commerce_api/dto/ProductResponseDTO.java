@@ -1,6 +1,7 @@
 package br.com.brevus.commerce_api.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ProductResponseDTO(
@@ -10,5 +11,7 @@ public record ProductResponseDTO(
         Integer stockQuantity,
         String imagePath,
         UUID categoryId,
-        String categoryName
+        String categoryName,
+        String description,
+        LocalDateTime createdAt
 ) {}

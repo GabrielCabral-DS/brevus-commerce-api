@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api.controller;
 
+import br.com.brevus.commerce_api.dto.CategoryReponseDTO;
 import br.com.brevus.commerce_api.dto.CategoryRequestDTO;
 import br.com.brevus.commerce_api.service.CategoryService;
 import jakarta.validation.Valid;
@@ -27,8 +28,8 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryRequestDTO>> listAllcategories(){
-        List<CategoryRequestDTO> categoryRequestDTOList = categoryService.listAllCategories();
+    public ResponseEntity<List<CategoryReponseDTO>> listAllcategories(){
+        List<CategoryReponseDTO> categoryRequestDTOList = categoryService.listAllCategories();
         return ResponseEntity.ok().body(categoryRequestDTOList);
     }
 

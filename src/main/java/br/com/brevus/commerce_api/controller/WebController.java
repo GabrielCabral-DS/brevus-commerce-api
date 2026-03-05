@@ -18,6 +18,9 @@ public class WebController {
         return "login";
     }
 
+    @GetMapping("/api/web/products-client")
+    public String productsUserClient(){return "products-client";}
+
     @GetMapping("/api/web/products")
     public String products(){
         return "products";

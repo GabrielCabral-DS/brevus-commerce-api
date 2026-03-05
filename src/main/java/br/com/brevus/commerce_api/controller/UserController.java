@@ -6,6 +6,7 @@ import br.com.brevus.commerce_api.service.AuthService;
 import br.com.brevus.commerce_api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,15 +61,21 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserRequestDTO>> listAllUsers(){
-        List<UserRequestDTO> userRequestDTOList = userService.listAllUsers();
-        return ResponseEntity.ok().body(userRequestDTOList);
+    public ResponseEntity<List<UsersResponseDTO>> listAllUsers(){
+        List<UsersResponseDTO> usersResponseDTOList = userService.listAllUsers();
+        return ResponseEntity.ok().body(usersResponseDTOList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserRequestDTO> getUsersById(@PathVariable(value = "id") UUID id){
-        UserRequestDTO userRequestDTO = userService.getUserById(id);
-        return ResponseEntity.ok().body(userRequestDTO);
+    public ResponseEntity<UsersResponseDTO> getUsersById(@PathVariable(value = "id") UUID id){
+        UsersResponseDTO usersResponseDTO = userService.getUserById(id);
+        return ResponseEntity.ok().body(usersResponseDTO);
+    }
+
+    @GetMapping("/recent-users")
+    public ResponseEntity<Page<UsersResponseDTO>> getRecentUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String search){
+        Page<UsersResponseDTO> usersResponseDTOList = userService.getRecentUsers(page, size, search);
+        return ResponseEntity.ok().body(usersResponseDTOList);
     }
 
     @PutMapping("/{id}")

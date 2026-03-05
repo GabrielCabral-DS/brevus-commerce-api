@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api.service;
 
+import br.com.brevus.commerce_api.dto.CategoryReponseDTO;
 import br.com.brevus.commerce_api.dto.CategoryRequestDTO;
 import br.com.brevus.commerce_api.mapper.CategoryMapper;
 import br.com.brevus.commerce_api.model.Category;
@@ -24,7 +25,7 @@ public class CategoryService {
         return categoryRepository.save(categoryMapper.toEntity(dto));
     }
 
-    public List<CategoryRequestDTO> listAllCategories(){
+    public List<CategoryReponseDTO> listAllCategories(){
         List<Category> categories = categoryRepository.findAll();
         return categoryMapper.toDtoList(categories);
     }

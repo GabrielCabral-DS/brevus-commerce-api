@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                                 "/api/web/reset-password",
                                 "/api/web/email-password",
                                 "/api/web/products",
+                                "/api/web/products-client",
                                 "/api/web/clients",
                                 "/api/web/home-user",
                                 "/api/web/home-manager",

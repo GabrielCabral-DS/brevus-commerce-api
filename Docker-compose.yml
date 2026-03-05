@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: commerce-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: commerce_db
+      POSTGRES_USER: ${POSTGRESQL_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  commerce-api:
+    build: .
+    container_name: commerce_api
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
+      ENVIO_EMAIL_USERNAME: ${ENVIO_EMAIL_USERNAME}
+      ENVIO_EMAIL_PASSWORD: ${ENVIO_EMAIL_PASSWORD}
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+
+      FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
+      FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET}
+
+volumes:
+  postgres_data:

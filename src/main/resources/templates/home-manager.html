@@ -14,7 +14,7 @@
             window.location.href = '/api/web/login';
         } else {
             // Verificar se é ADMIN, senão redirecionar
-            if (!AuthUtils.hasRole('ADMIN')) {
+            if (!AuthUtils.hasRole('ADMIN') && !AuthUtils.hasRole('SELLER')) {
                 window.location.href = '/api/web/home-user';
             }
         }
@@ -33,17 +33,25 @@
 
     <nav class="flex-1 px-4 space-y-2 mt-4">
         <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold">
-            <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
-        </a>
-        <a href="/api/web/products" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-            <i class="fa-solid fa-box w-5"></i> Produtos
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
         </a>
 
-        <a href="/api/web/clients" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-            <i class="fa-solid fa-users w-5"></i> Clientes
+        <a href="#" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-cart-shopping w-5 text-center group-hover:text-indigo-600"></i> Vendas
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-            <i class="fa-solid fa-layer-group w-5"></i> Vendas
+
+        <a href="/api/web/products" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-box-archive w-5 text-center group-hover:text-indigo-600"></i> Produtos
+        </a>
+
+        <a href="/api/web/clients" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-users w-5 text-center group-hover:text-indigo-600"></i> Clientes
+        </a>
+
+        <hr class="my-4 border-slate-200 dark:border-slate-700" />
+
+        <a href="#" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-circle-user w-5 text-center group-hover:text-indigo-600"></i> Perfil
         </a>
     </nav>
 

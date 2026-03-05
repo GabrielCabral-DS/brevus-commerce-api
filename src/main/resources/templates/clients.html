@@ -8,13 +8,9 @@
   <script src="/js/auth-utils.js"></script>
   <script>
     tailwind.config = { darkMode: 'class' }
-
-    // Inicialização do tema
     if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
     }
-
-    // Proteção de Rota
     if (!AuthUtils.isAuthenticated() || !AuthUtils.hasRole('ADMIN')) {
         window.location.href = '/api/web/login';
     }
@@ -48,11 +44,11 @@
       <p class="text-slate-500 dark:text-slate-400 text-sm">Visualize e gerencie as contas registradas.</p>
     </div>
     <div class="relative w-full max-w-xs">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </span>
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+          <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
       <input type="text" id="searchInput" oninput="searchClients()" placeholder="Buscar por nome ou e-mail..."
-             class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+             class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
     </div>
   </div>
 
@@ -67,16 +63,19 @@
           <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Ações</th>
         </tr>
         </thead>
-        <tbody id="clientTableBody" class="divide-y divide-slate-100 dark:divide-slate-700">
-        </tbody>
+        <tbody id="clientTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
       </table>
     </div>
 
     <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
-      <span id="pageInfo" class="text-sm text-slate-500 dark:text-slate-400">Página 1 de 10</span>
+      <span id="pageInfo" class="text-sm text-slate-500 dark:text-slate-400 font-medium">Carregando...</span>
       <div class="flex gap-2">
-        <button id="prevPage" onclick="changePage(-1)" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors">Anterior</button>
-        <button id="nextPage" onclick="changePage(1)" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors">Próxima</button>
+        <button id="prevPage" onclick="changePage(-1)" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 dark:hover:bg-indigo-600 dark:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+          <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+        </button>
+        <button id="nextPage" onclick="changePage(1)" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 dark:hover:bg-indigo-600 dark:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+          Próxima <i class="fa-solid fa-chevron-right ml-1"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -86,12 +85,10 @@
   <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
     <div class="p-8 text-center relative">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-
       <div class="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4" id="modalInitial">U</div>
-      <h3 id="modalName" class="text-2xl font-black text-slate-800 dark:text-white">Nome do Usuário</h3>
+      <h3 id="modalName" class="text-2xl font-black text-slate-800 dark:text-white">Nome</h3>
       <span id="modalRoles" class="text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 px-3 py-1 rounded-full uppercase">Client</span>
     </div>
-
     <div class="px-8 pb-8 space-y-4">
       <div class="grid grid-cols-2 gap-4">
         <div class="p-4 bg-slate-50 dark:bg-slate-700/30 rounded-2xl">
@@ -124,26 +121,32 @@
   const pageSize = 10;
   let searchQuery = '';
 
-  // Lógica de Busca e Paginação
   async function loadClients() {
       try {
-          const url = `/api/users?page=${currentPage}&size=${pageSize}&search=${searchQuery}`;
+          const url = `/api/users/recent-users?page=${currentPage}&size=${pageSize}&search=${encodeURIComponent(searchQuery)}`;
           const res = await AuthUtils.authenticatedFetch(url);
-          const data = await res.json(); // Espera um Page<User> do Spring
+          const data = await res.json();
 
-          renderTable(data.content);
+          // Com VIA_DTO, os dados estão em data.content e metadados em data.page
+          renderTable(data.content || []);
           updatePaginationUI(data);
-      } catch (e) { console.error("Erro ao carregar clientes", e); }
+      } catch (e) {
+          console.error("Erro ao carregar clientes", e);
+      }
   }
 
   function renderTable(clients) {
       const tbody = document.getElementById('clientTableBody');
+      if (clients.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-500 dark:text-slate-400">Nenhum cliente encontrado.</td></tr>`;
+          return;
+      }
       tbody.innerHTML = clients.map(user => `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                      <div class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">
-                          ${user.name.charAt(0)}
+                      <div class="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center font-bold">
+                          ${user.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
                           <p class="text-sm font-bold text-slate-800 dark:text-white">${user.name}</p>
@@ -152,14 +155,14 @@
                   </div>
               </td>
               <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-                  <i class="fa-solid fa-phone text-[10px] mr-1"></i> ${user.phone}
+                  <i class="fa-solid fa-phone text-[10px] mr-1 opacity-50"></i> ${user.phone || 'N/A'}
               </td>
               <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-                  ${user.dateRegistered}
+                  ${user.dateRegistered || '---'}
               </td>
               <td class="px-6 py-4 text-right">
                   <button onclick='showDetails(${JSON.stringify(user)})'
-                          class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all">
+                          class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
                       Detalhes
                   </button>
               </td>
@@ -167,10 +170,25 @@
       `).join('');
   }
 
-  function updatePaginationUI(pageData) {
-      document.getElementById('pageInfo').textContent = `Página ${pageData.number + 1} de ${pageData.totalPages}`;
-      document.getElementById('prevPage').disabled = pageData.first;
-      document.getElementById('nextPage').disabled = pageData.last;
+  function updatePaginationUI(data) {
+      const pageInfo = data.page; // Estrutura VIA_DTO
+      const infoSpan = document.getElementById('pageInfo');
+      const prevBtn = document.getElementById('prevPage');
+      const nextBtn = document.getElementById('nextPage');
+
+      if (pageInfo) {
+          const current = pageInfo.number + 1;
+          const total = Math.max(1, pageInfo.totalPages);
+
+          infoSpan.textContent = `Página ${current} de ${total}`;
+          prevBtn.disabled = (pageInfo.number === 0);
+          nextBtn.disabled = (current >= total);
+      } else {
+          // Fallback caso o VIA_DTO não esteja ativo
+          infoSpan.textContent = "Página 1 de 1";
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+      }
   }
 
   function changePage(step) {
@@ -180,21 +198,20 @@
 
   function searchClients() {
       searchQuery = document.getElementById('searchInput').value;
-      currentPage = 0;
+      currentPage = 0; // Reseta para a primeira página ao buscar
       loadClients();
   }
 
   function showDetails(user) {
       document.getElementById('modalName').textContent = user.name;
       document.getElementById('modalEmail').textContent = user.email;
-      document.getElementById('modalPhone').textContent = user.phone;
-      document.getElementById('modalBirth').textContent = user.dateBirth;
+      document.getElementById('modalPhone').textContent = user.phone || 'Não informado';
+      document.getElementById('modalBirth').textContent = user.dateBirth || 'Não informado';
       document.getElementById('modalRegistered').textContent = user.dateRegistered;
       document.getElementById('modalId').textContent = user.id;
-      document.getElementById('modalInitial').textContent = user.name.charAt(0);
+      document.getElementById('modalInitial').textContent = user.name.charAt(0).toUpperCase();
 
-      // Roles formatadas
-      const roles = user.userRoles.map(r => r.role).join(' / ');
+      const roles = user.userRoles ? user.userRoles.map(r => r.role).join(' / ') : 'CLIENT';
       document.getElementById('modalRoles').textContent = roles;
 
       document.getElementById('detailsModal').classList.remove('hidden');
@@ -204,7 +221,7 @@
       document.getElementById('detailsModal').classList.add('hidden');
   }
 
-  // --- LÓGICA DE TEMA ---
+  // --- TEMA ---
   const themeToggleBtn = document.getElementById('theme-toggle');
   const darkIcon = document.getElementById('theme-toggle-dark-icon');
   const lightIcon = document.getElementById('theme-toggle-light-icon');
@@ -223,7 +240,6 @@
       updateIcons();
   });
 
-  // Inicialização
   updateIcons();
   loadClients();
 </script>

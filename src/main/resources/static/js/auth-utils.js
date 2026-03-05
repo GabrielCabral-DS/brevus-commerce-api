@@ -204,7 +204,9 @@ class AuthUtils {
 
     if (roles.includes('ADMIN')) {
       window.location.href = '/api/web/home-manager';
-    } else if (roles.includes('CLIENT')) {
+    }else if(roles.includes('SELLER')){
+      window.location.href = '/api/web/home-manager';
+    }else if (roles.includes('CLIENT')) {
       window.location.href = '/api/web/home-user';
     } else {
       window.location.href = '/api/web/home-user';

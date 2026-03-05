@@ -1,12 +1,9 @@
 package br.com.brevus.commerce_api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +20,9 @@ public class Product {
     private BigDecimal price;
     private Integer stockQuantity;
     private String imagePath;
+    private String description;
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -34,12 +34,14 @@ public class Product {
     public Product() {
     }
 
-    public Product(UUID id, String name, BigDecimal price, Integer stockQuantity, String imagePath, Category category, List<StockMovement> stockMovements) {
+    public Product(UUID id, String name, BigDecimal price, Integer stockQuantity, String imagePath, String description, LocalDateTime createdAt, Category category, List<StockMovement> stockMovements) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.imagePath = imagePath;
+        this.description = description;
+        this.createdAt = createdAt;
         this.category = category;
         this.stockMovements = stockMovements;
     }
@@ -82,6 +84,22 @@ public class Product {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Category getCategory() {

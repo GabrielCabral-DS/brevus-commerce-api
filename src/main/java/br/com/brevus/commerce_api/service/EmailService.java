@@ -1,7 +1,6 @@
 package br.com.brevus.commerce_api.service;
 
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,13 +11,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String remetente;
+
+    public EmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
     public String sendRecoverPassword(String destinatario, String assunto, String linkToken, String name) {
         try {

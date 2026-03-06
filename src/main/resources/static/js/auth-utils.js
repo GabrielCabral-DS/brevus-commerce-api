@@ -219,3 +219,4 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = AuthUtils;
 }
 
+window.AuthUtils = AuthUtils;

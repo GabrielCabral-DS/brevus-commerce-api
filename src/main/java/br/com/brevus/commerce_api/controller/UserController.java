@@ -78,9 +78,15 @@ public class UserController {
         return ResponseEntity.ok().body(usersResponseDTOList);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUsersById(@Valid @PathVariable(value = "id") UUID id, @RequestBody UserRequestDTO dto){
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<Void> updateUsersById(@PathVariable(value = "id") UUID id, @Valid @RequestBody UserProfileRequestDTO dto){
         userService.updateUsers(id,dto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/password/{id}")
+    public ResponseEntity<Void> updatePassword(@PathVariable(value = "id") UUID id, @Valid @RequestBody PasswordRequestDTO dto){
+        userService.updatePassword(id,dto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

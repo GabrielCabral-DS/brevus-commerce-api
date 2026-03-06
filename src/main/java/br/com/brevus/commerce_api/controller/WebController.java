@@ -13,6 +13,11 @@ public class WebController {
         return "redirect:/api/web/login";
     }
 
+    @GetMapping("/api/web/profile")
+    public String profileManager(){
+        return "profile";
+    }
+
     @GetMapping("/api/web/login")
     public String loginUserPage(){
         return "login";

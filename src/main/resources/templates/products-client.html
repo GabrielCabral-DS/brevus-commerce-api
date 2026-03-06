@@ -14,6 +14,17 @@
         } else {
             document.documentElement.classList.remove('dark');
         }
+        if (!AuthUtils.isAuthenticated()) {
+        window.location.href = '/api/web/login';
+        }
+        // 2. Se estiver logado, verifica se tem a permissão necessária
+        else {
+        const isClient = AuthUtils.hasRole('CLIENT');
+
+        if (!isClient) {
+          window.location.href = '/api/web/login'; // Redireciona para a área de cliente
+        }
+}
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>

@@ -13,7 +13,20 @@
     } else {
         document.documentElement.classList.remove('dark');
     }
-    if (!AuthUtils.isAuthenticated()) window.location.href = '/api/web/login';
+    // 1. Verifica se está logado
+    if (!AuthUtils.isAuthenticated()) {
+    window.location.href = '/api/web/login';
+    }
+    // 2. Se estiver logado, verifica se tem a permissão necessária
+    else {
+    const isAdmin = AuthUtils.hasRole('ADMIN');
+    const isSeller = AuthUtils.hasRole('SELLER');
+
+    // Se NÃO for admin E NÃO for seller, ele é um intruso nesta página
+    if (!isAdmin && !isSeller) {
+        window.location.href = '/api/web/login';
+    }
+}
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>

@@ -21,60 +21,55 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col lg:flex-row transition-colors duration-300">
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex transition-colors duration-300">
 
-<aside id="sidebar" class="w-full lg:w-64 bg-white dark:bg-slate-800 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 flex flex-col sticky top-0 h-auto lg:h-screen">
-    <div class="p-4 sm:p-6 flex items-center justify-between lg:justify-start gap-3">
-        <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 p-2 rounded-lg text-white">
-                <i class="fa-solid fa-gears text-sm sm:text-base"></i>
-            </div>
-            <span class="hidden sm:inline text-lg sm:text-xl font-bold text-slate-800 dark:text-white uppercase tracking-wider">Admin<span class="text-indigo-600">API</span></span>
+<aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="p-6 flex items-center gap-3">
+        <div class="bg-indigo-600 p-2 rounded-lg text-white">
+            <i class="fa-solid fa-gears"></i>
         </div>
-        <button id="mobileSidebarToggle" class="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
-            <i class="fa-solid fa-bars"></i>
-        </button>
+        <span class="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-wider">Admin<span class="text-indigo-600">API</span></span>
     </div>
 
-    <nav id="navMenu" class="hidden lg:flex flex-col flex-1 px-3 sm:px-4 space-y-2 mt-4 pb-4 lg:pb-0">
-        <a href="#" class="flex items-center gap-3 p-2 sm:p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold text-sm sm:text-base">
-            <i class="fa-solid fa-chart-pie w-4 sm:w-5 text-center"></i> <span class="hidden sm:inline">Dashboard</span>
+    <nav class="flex-1 px-4 space-y-2 mt-4">
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
         </a>
 
-        <a href="#" class="group flex items-center gap-3 p-2 sm:p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm sm:text-base">
-            <i class="fa-solid fa-cart-shopping w-4 sm:w-5 text-center group-hover:text-indigo-600"></i> <span class="hidden sm:inline">Vendas</span>
+        <a href="#" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-cart-shopping w-5 text-center group-hover:text-indigo-600"></i> Vendas
         </a>
 
-        <a href="/api/web/products" class="group flex items-center gap-3 p-2 sm:p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm sm:text-base">
-            <i class="fa-solid fa-box-archive w-4 sm:w-5 text-center group-hover:text-indigo-600"></i> <span class="hidden sm:inline">Produtos</span>
+        <a href="/api/web/products" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-box-archive w-5 text-center group-hover:text-indigo-600"></i> Produtos
         </a>
 
-        <a href="/api/web/clients" class="group flex items-center gap-3 p-2 sm:p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm sm:text-base">
-            <i class="fa-solid fa-users w-4 sm:w-5 text-center group-hover:text-indigo-600"></i> <span class="hidden sm:inline">Clientes</span>
+        <a href="/api/web/clients" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-users w-5 text-center group-hover:text-indigo-600"></i> Clientes
         </a>
 
-        <hr class="my-3 sm:my-4 border-slate-200 dark:border-slate-700" />
+        <hr class="my-4 border-slate-200 dark:border-slate-700" />
 
-        <a href="#" class="group flex items-center gap-3 p-2 sm:p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm sm:text-base">
-            <i class="fa-solid fa-circle-user w-4 sm:w-5 text-center group-hover:text-indigo-600"></i> <span class="hidden sm:inline">Perfil</span>
+        <a href="#" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-circle-user w-5 text-center group-hover:text-indigo-600"></i> Perfil
         </a>
     </nav>
 
-    <div class="p-3 sm:p-4 border-t border-slate-200 dark:border-slate-700">
-        <button id="theme-toggle" class="w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs sm:text-sm">
-            <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon text-sm"></i>
-            <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun text-sm"></i>
-            <span class="font-medium hidden sm:inline">Alternar</span>
+    <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+        <button id="theme-toggle" class="w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700">
+            <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
+            <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
+            <span class="text-sm font-medium">Alternar Tema</span>
         </button>
     </div>
 </aside>
 
 <main class="flex-1 overflow-y-auto">
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-3 sm:p-4 sticky top-0 z-10 flex justify-between items-center gap-3">
-        <h2 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Visão Geral</h2>
-        <div class="flex items-center gap-2 sm:gap-4">
-            <div class="text-right hidden sm:block">
-                <p class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white" id="adminName">Admin Master</p>
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 sticky top-0 z-10 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white">Visão Geral</h2>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p class="text-sm font-bold text-slate-800 dark:text-white" id="adminName">Admin Master</p>
                 <p class="text-xs text-green-500 font-medium">Sistema Online</p>
             </div>
             <div class="relative">
@@ -99,13 +94,6 @@
             document.getElementById('adminInitial').textContent = adminInfo.name.charAt(0).toUpperCase();
         }
 
-        // Toggle menu mobile
-        document.getElementById('mobileSidebarToggle')?.addEventListener('click', function() {
-            const navMenu = document.getElementById('navMenu');
-            navMenu.classList.toggle('hidden');
-            navMenu.classList.toggle('flex');
-        });
-
         // Toggle menu do admin
         document.getElementById('adminMenu').addEventListener('click', function() {
             const dropdown = document.getElementById('adminDropdown');
@@ -122,22 +110,22 @@
         });
     </script>
 
-    <div class="p-4 sm:p-6 lg:p-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+    <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="p-2 sm:p-3 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 rounded-xl">
-                        <i class="fa-solid fa-money-bill-trend-up text-lg sm:text-xl"></i>
+                    <div class="p-3 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 rounded-xl">
+                        <i class="fa-solid fa-money-bill-trend-up text-xl"></i>
                     </div>
                     <span class="text-xs font-bold text-green-500 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded">+12%</span>
                 </div>
-                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium">Faturamento Total</p>
-                <h3 class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white mt-1">R$ <span th:text="${totalFaturamento}">45.230,00</span></h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Faturamento Total</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1">R$ <span th:text="${totalFaturamento}">45.230,00</span></h3>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="p-2 sm:p-3 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl">
+                    <div class="p-3 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl">
                         <i class="fa-solid fa-box-archive text-xl"></i>
                     </div>
                 </div>

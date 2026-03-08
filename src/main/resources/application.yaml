@@ -8,6 +8,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  output:
+    ansi:
+      enabled: ALWAYS
+
   jpa:
     open-in-view: false
     hibernate:
@@ -49,6 +53,21 @@ server:
     include-message: always
     include-binding-errors: always
     include-stacktrace: on_param
+
+app:
+  pix:
+    clientId: ${EFIBANK_CLIENT_ID}
+    clientSecret: ${EFIBANK_CLIENT_SECRET}
+    certificatePath: certificate/producao-854204-commerce-api.p12
+    sandbox: false
+    debug: true
+    webhook:
+      chave: ${EFIBANK_CHAVE_PIX_WEBHOOK}
+      hmac:
+        api: ${EFIBANK_HMAC_WEBHOOK}
+        retorno:
+          api: ${EFIBANK_HMAC_RETORNO_API_WEBHOOK}
+      url: ${EFIBANK_URL_PIX_WEBHOOK}
 
 springdoc:
   override-with-generic-response: false

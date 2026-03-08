@@ -1,8 +1,9 @@
 package br.com.brevus.commerce_api.service;
 
-import br.com.brevus.commerce_api.dto.RecoverPasswordEmailRequestDTO;
-import br.com.brevus.commerce_api.dto.UserRequestDTO;
-import br.com.brevus.commerce_api.dto.UsersResponseDTO;
+import br.com.brevus.commerce_api.dto.*;
+import br.com.brevus.commerce_api.exceptions.BadCredentialsException;
+import br.com.brevus.commerce_api.exceptions.BusinessException;
+import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.mapper.UserMapper;
 import br.com.brevus.commerce_api.model.User;
 import br.com.brevus.commerce_api.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -49,7 +51,7 @@ public class UserService {
         return userMapper.toDtoList(userList);
     }
 
-    public User updateUsers(UUID id, UserRequestDTO dto){
+    public User updateUsers(UUID id, UserProfileRequestDTO dto){
         User user = userRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
@@ -109,5 +111,28 @@ public class UserService {
         }
 
         return userPage.map(userMapper::toDto);
+    }
+
+    public User updatePassword(UUID uuid, PasswordRequestDTO dto) {
+
+        User userModel = userRepository.findById(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(dto.currentPassword(), userModel.getPassword())) {
+            throw new BadCredentialsException("Senha atual incorreta!");
+        }
+
+        if (!Objects.equals(dto.password(), dto.passwordConfirmation())) {
+            throw new BusinessException("As senhas estão divergentes!");
+        }
+
+        if (passwordEncoder.matches(dto.password(), userModel.getPassword())) {
+            throw new BusinessException("A nova senha não pode ser igual à senha atual!");
+        }
+
+        String encodedPassword = passwordEncoder.encode(dto.password());
+        userModel.setPassword(encodedPassword);
+
+        return userRepository.save(userModel);
     }
 }

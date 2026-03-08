@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Meus Pedidos</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen">
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-8">
+
+    <div>
+      <h1 class="text-3xl font-bold text-slate-800 dark:text-white">
+        📦 Meus Pedidos
+      </h1>
+
+      <p class="text-slate-500 dark:text-slate-400">
+        Acompanhe seus pedidos realizados
+      </p>
+    </div>
+
+    <a href="/api/web/home-user"
+       class="bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:opacity-80">
+      <i class="fa-solid fa-arrow-left"></i> Voltar
+    </a>
+
+  </div>
+
+
+  <!-- LISTA DE PEDIDOS -->
+  <div class="space-y-6">
+
+    <!-- CARD PEDIDO -->
+    <div th:each="order : ${orders}"
+         class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <!-- INFO PEDIDO -->
+        <div>
+
+          <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+            Pedido #<span th:text="${order.id}"></span>
+          </h2>
+
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Realizado em
+            <span th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></span>
+          </p>
+
+        </div>
+
+        <!-- STATUS PEDIDO -->
+        <div class="flex flex-wrap gap-3">
+
+          <!-- STATUS -->
+          <span
+                  th:text="${order.status}"
+                  class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-600">
+</span>
+
+          <!-- PAGAMENTO -->
+          <span
+                  th:text="${order.paymentStatus}"
+                  class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-600">
+</span>
+
+        </div>
+
+
+        <!-- TOTAL -->
+        <div class="text-lg font-bold text-slate-700 dark:text-white">
+
+          R$ <span th:text="${order.total}"></span>
+
+        </div>
+
+      </div>
+
+
+      <!-- PRODUTOS DO PEDIDO -->
+      <div class="mt-6 border-t pt-4">
+
+        <h3 class="font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          Produtos
+        </h3>
+
+        <div class="space-y-2">
+
+          <div
+                  th:each="item : ${order.items}"
+                  class="flex justify-between text-sm">
+
+            <div>
+
+              <span th:text="${item.productName}"></span>
+              <span class="text-slate-400">
+x<span th:text="${item.quantity}"></span>
+</span>
+
+            </div>
+
+            <div>
+
+              R$ <span th:text="${item.price}"></span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- RASTREAMENTO -->
+      <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div class="text-sm text-slate-600 dark:text-slate-400">
+
+          🚚 Rastreamento:
+
+          <span th:if="${order.trackingCode != null}"
+                class="font-medium"
+                th:text="${order.trackingCode}">
+    </span>
+
+          <span th:if="${order.trackingCode == null}">
+         Aguardando envio
+     </span>
+
+        </div>
+
+        <!-- DETALHES -->
+        <a
+                th:href="@{/api/web/orders/{id}(id=${order.id})}"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">
+
+          Ver detalhes
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SEM PEDIDOS -->
+  <div
+          th:if="${orders.isEmpty()}"
+          class="text-center py-20">
+
+    <div class="text-6xl mb-4">
+      📦
+    </div>
+
+    <h2 class="text-xl font-semibold text-slate-700 dark:text-white">
+      Você ainda não fez pedidos
+    </h2>
+
+    <p class="text-slate-500 mt-2">
+      Explore nossos produtos e faça sua primeira compra
+    </p>
+
+    <a href="/api/web/products-client"
+       class="mt-6 inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg">
+
+      Ver produtos
+
+    </a>
+
+  </div>
+
+
+</div>
+
+</body>
+</html>

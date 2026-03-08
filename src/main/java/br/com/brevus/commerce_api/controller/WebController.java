@@ -2,7 +2,11 @@ package br.com.brevus.commerce_api.controller;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class WebController {
@@ -16,6 +20,12 @@ public class WebController {
     @GetMapping("/api/web/profile")
     public String profileManager(){
         return "profile";
+    }
+
+    @GetMapping("/api/web/my-orders")
+    public String myOrders(Model model){
+        model.addAttribute("orders", List.of());
+        return "my-orders";
     }
 
     @GetMapping("/api/web/login")

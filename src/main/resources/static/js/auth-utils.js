@@ -104,6 +104,7 @@ class AuthUtils {
 
     const claims = this.decodeToken(token);
     return {
+      id: claims?.id,
       sub: claims?.sub,
       email: claims?.email,
       name: claims?.name,

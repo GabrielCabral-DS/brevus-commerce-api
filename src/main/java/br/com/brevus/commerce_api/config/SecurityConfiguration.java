@@ -45,6 +45,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",
+                                "/favicon.ico",
                                 "/api/web/**",
                                 "/api/users/reset-password",
                                 "/api/users/recover-password",

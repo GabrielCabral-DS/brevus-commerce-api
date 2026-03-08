@@ -145,7 +145,7 @@
         if (data.phone) data.phone = data.phone.replace(/\D/g, '');
 
         try {
-            const res = await fetch(`/api/users/profile/${userInfo.sub}`, {
+            const res = await fetch(`/api/users/profile/${userInfo.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -177,7 +177,7 @@
         }
 
         try {
-            const res = await fetch(`/api/users/password/${userInfo.sub}`, {
+            const res = await fetch(`/api/users/password/${userInfo.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

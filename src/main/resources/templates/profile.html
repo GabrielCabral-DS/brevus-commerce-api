@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Brevus Commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        // Verifica autenticação antes de carregar a página
+        if (typeof AuthUtils !== 'undefined' && !AuthUtils.isAuthenticated()) {
+            window.location.href = '/api/web/login';
+        }
+
+        function updateTheme() {
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        updateTheme();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-300 pb-12">
+
+<nav class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <a href="javascript:history.back()" class="text-slate-500 hover:text-indigo-600 transition-colors">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <span class="text-xl font-bold text-slate-800 dark:text-white ml-2">Configurações de <span class="text-indigo-600">Perfil</span></span>
+        </div>
+        <button id="theme-toggle" class="text-slate-500 dark:text-slate-400 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+    </div>
+</nav>
+
+<main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+
+    <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
+            <div class="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg text-indigo-600">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 dark:text-white">Informações Pessoais</h3>
+        </div>
+
+        <form id="updateProfileForm" class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Nome Completo</label>
+                    <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Telefone</label>
+                    <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">E-mail</label>
+                    <input type="email" id="email" disabled class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-400 border border-transparent cursor-not-allowed">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Data de Nascimento</label>
+                    <input type="date" id="dateBirth" name="dateBirth" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all">
+                    Salvar Dados
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
+            <div class="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg text-amber-600">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 dark:text-white">Segurança e Senha</h3>
+        </div>
+
+        <form id="changePasswordForm" class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Senha Atual</label>
+                    <input type="password" name="currentPassword" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Nova Senha</label>
+                    <input type="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Confirmar Nova Senha</label>
+                    <input type="password" name="passwordConfirmation" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-8 py-3 bg-slate-800 dark:bg-amber-600 text-white font-bold rounded-xl hover:opacity-90 transition-all">
+                    Atualizar Senha
+                </button>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<script>
+    // Inicialização segura
+    const userInfo = typeof AuthUtils !== 'undefined' ? AuthUtils.getUserInfo() : null;
+
+    if (userInfo) {
+        // Preenchimento dos inputs
+        if(document.getElementById('name')) document.getElementById('name').value = userInfo.name || '';
+        if(document.getElementById('email')) document.getElementById('email').value = userInfo.email || '';
+        if(document.getElementById('phone')) document.getElementById('phone').value = userInfo.phone || '';
+        if(document.getElementById('dateBirth')) document.getElementById('dateBirth').value = userInfo.dateBirth || '';
+
+        // Atualização dos elementos de cabeçalho (Verifica se existem antes de atribuir)
+        const displayElem = document.getElementById('displayUserName');
+        const initialElem = document.getElementById('profileInitial');
+
+        if (displayElem) displayElem.textContent = userInfo.name || 'Usuário';
+        if (initialElem && userInfo.name) {
+            initialElem.textContent = userInfo.name.charAt(0).toUpperCase();
+        }
+    }
+
+    // Toggle Tema
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Lógica 1: Dados Pessoais
+    document.getElementById('updateProfileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        data.email = document.getElementById('email').value; // disabled field manual pick
+        if (data.phone) data.phone = data.phone.replace(/\D/g, '');
+
+        try {
+            const res = await fetch(`/api/users/profile/${userInfo.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AuthUtils.getAccessToken()}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert('✅ Dados atualizados!');
+                location.reload();
+            } else {
+                const errorData = await res.json();
+                alert('❌ Erro: ' + (errorData.message || 'Falha na atualização.'));
+            }
+        } catch (err) {
+            alert('🌐 Erro de conexão.');
+        }
+    });
+
+    // Lógica 2: Senha
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+
+        if (data.password !== data.passwordConfirmation) {
+            alert('⚠️ As senhas não coincidem!');
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/users/password/${userInfo.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AuthUtils.getAccessToken()}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert('✅ Senha alterada! Refaça o login.');
+                AuthUtils.logout();
+            } else {
+                const errJson = await res.json();
+                alert('❌ Erro: ' + (errJson.message || 'Senha atual incorreta.'));
+            }
+        } catch (err) {
+            alert('🌐 Erro no processamento.');
+        }
+    });
+</script>
+</body>
+</html>

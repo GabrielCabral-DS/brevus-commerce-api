@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,10 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
-@RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtFilter;
+
+    public SecurityConfiguration(JwtAuthenticationFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
 
     @Bean
@@ -43,16 +45,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",
-                                "/api/web/register-user",
-                                "/api/web/reset-password",
-                                "/api/web/email-password",
-                                "/api/web/products",
-                                "/api/web/products-client",
-                                "/api/web/clients",
-                                "/api/web/home-user",
-                                "/api/web/home-manager",
-                                "/api/web/login",
-                                "/api/web/oauth2-callback",
+                                "/favicon.ico",
+                                "/api/web/**",
                                 "/api/users/reset-password",
                                 "/api/users/recover-password",
                                 "/api/users/login",
@@ -80,10 +74,13 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
+
+
 }

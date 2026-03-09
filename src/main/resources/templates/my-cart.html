@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Seguro | Sua Loja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Configuração do Tailwind para usar classes de modo escuro
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        if (!AuthUtils.isAuthenticated()) {
+        window.location.href = '/api/web/login';
+        }
+        // 2. Se estiver logado, verifica se tem a permissão necessária
+        else {
+        const isClient = AuthUtils.hasRole('CLIENT');
+
+        if (!isClient) {
+          window.location.href = '/api/web/login'; // Redireciona para a área de cliente
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-gray-800 dark:text-slate-200 antialiased transition-colors duration-300">
+
+<div class="max-w-7xl mx-auto px-4 py-8 md:py-12">
+
+    <header class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight dark:text-white">Meu Carrinho</h1>
+            <a href="/produtos" class="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-2 text-sm">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Continuar Comprando
+            </a>
+        </div>
+
+        <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-slate-800 hover:ring-2 ring-blue-500 transition-all">
+            <i data-lucide="sun" id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500"></i>
+            <i data-lucide="moon" id="theme-toggle-dark-icon" class="w-5 h-5 text-slate-700 dark:text-blue-400"></i>
+        </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        <main class="lg:col-span-8">
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800">
+                        <tr>
+                            <th class="p-4 font-semibold text-sm uppercase tracking-wider">Produto</th>
+                            <th class="p-4 font-semibold text-sm uppercase tracking-wider">Qtd</th>
+                            <th class="p-4 font-semibold text-sm uppercase tracking-wider text-right">Preço</th>
+                            <th class="p-4"></th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
+                        <tr class="hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="p-4 flex items-center gap-4">
+                                <div class="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-lg flex-shrink-0">
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 dark:text-white">Smartphone Nexus G1</h3>
+                                    <p class="text-xs text-gray-500 dark:text-slate-400">Ref: SKU-9920</p>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <div class="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg w-fit bg-white dark:bg-slate-900">
+                                    <button class="px-3 py-1 hover:bg-gray-100 dark:hover:bg-slate-800">-</button>
+                                    <span class="px-4 py-1 text-sm font-bold">1</span>
+                                    <button class="px-3 py-1 hover:bg-gray-100 dark:hover:bg-slate-800">+</button>
+                                </div>
+                            </td>
+                            <td class="p-4 font-bold text-right">R$ 2.499,00</td>
+                            <td class="p-4 text-right text-gray-400 hover:text-red-500 cursor-pointer">
+                                <i data-lucide="trash-2" class="w-5 h-5 ml-auto"></i>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm">
+                    <label class="block text-sm font-semibold mb-3 dark:text-slate-300">Cupom de Desconto</label>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Código" class="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <button class="bg-slate-800 dark:bg-blue-600 text-white px-6 py-2 rounded-lg hover:opacity-90 transition font-medium">Aplicar</button>
+                    </div>
+                </div>
+                <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm">
+                    <label class="block text-sm font-semibold mb-3 dark:text-slate-300">Calcular Frete</label>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="00000-000" class="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <button class="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 px-6 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition font-medium">Calcular</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="lg:col-span-4">
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-800 p-8 sticky top-6">
+                <h2 class="text-xl font-bold mb-6 pb-4 border-b border-gray-50 dark:border-slate-800 dark:text-white">Resumo</h2>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between text-gray-500 dark:text-slate-400">
+                        <span>Subtotal</span>
+                        <span>R$ 2.499,00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-500 dark:text-slate-400">
+                        <span>Frete</span>
+                        <span class="text-green-600 dark:text-green-400 font-bold">Grátis</span>
+                    </div>
+                    <div class="flex justify-between text-2xl font-black text-gray-900 dark:text-white pt-6 border-t border-gray-100 dark:border-slate-800">
+                        <span>Total</span>
+                        <span>R$ 2.499,00</span>
+                    </div>
+                </div>
+
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                    <i data-lucide="lock" class="w-5 h-5"></i> Finalizar Compra
+                </button>
+
+                <div class="mt-8 text-center">
+                    <p class="text-[10px] uppercase font-bold text-gray-400 dark:text-slate-500 tracking-widest mb-4">Pagamento Seguro via SSL</p>
+                    <div class="flex justify-center gap-4 grayscale opacity-70 dark:invert">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="h-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-4">
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    // Inicializa ícones
+    lucide.createIcons();
+
+    // Lógica de Troca de Tema
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+    const htmlElement = document.documentElement;
+
+    themeToggleBtn.addEventListener('click', () => {
+        if (htmlElement.classList.contains('dark')) {
+            htmlElement.classList.remove('dark');
+            htmlElement.classList.add('light');
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
+        } else {
+            htmlElement.classList.remove('light');
+            htmlElement.classList.add('dark');
+            darkIcon.classList.add('hidden');
+            lightIcon.classList.remove('hidden');
+        }
+    });
+
+    function renderCheckout() {
+        const cart = JSON.parse(localStorage.getItem('brevus_cart')) || [];
+        const tbody = document.getElementById('cartItemsBody');
+        const totalElement = document.getElementById('cartTotal'); // adicione esse id no seu span de total
+
+        if (cart.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center">Carrinho vazio</td></tr>';
+            return;
+        }
+
+        let totalGeral = 0;
+
+        tbody.innerHTML = cart.map(item => {
+            const subtotal = item.price * item.quantity;
+            totalGeral += subtotal;
+            return `
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td class="p-4 flex items-center gap-4">
+                        <img src="${item.imageUrl || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <h3 class="font-bold text-gray-900 dark:text-white">${item.name}</h3>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg w-fit">
+                            <button onclick="updateQty(${item.id}, -1)" class="px-2 py-1">-</button>
+                            <span class="px-3 font-bold">${item.quantity}</span>
+                            <button onclick="updateQty(${item.id}, 1)" class="px-2 py-1">+</button>
+                        </div>
+                    </td>
+                    <td class="p-4 font-bold text-right">R$ ${subtotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                </tr>
+            `;
+        }).join('');
+
+        // Atualiza os totais na tela
+        document.querySelectorAll('.total-value').forEach(el => {
+            el.textContent = `R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+        });
+    }
+
+    function updateQty(id, delta) {
+        let cart = JSON.parse(localStorage.getItem('brevus_cart'));
+        const index = cart.findIndex(i => i.id === id);
+        if (index > -1) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            localStorage.setItem('brevus_cart', JSON.stringify(cart));
+            renderCheckout();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCheckout);
+</script>
+</body>
+</html>

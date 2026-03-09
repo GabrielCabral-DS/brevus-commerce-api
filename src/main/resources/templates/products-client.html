@@ -119,6 +119,16 @@
     let selectedCategory = '';
     let cart = JSON.parse(localStorage.getItem('brevus_cart')) || [];
 
+    function toggleCart() {
+    // Verifica se o carrinho está vazio antes de redirecionar (opcional)
+    if (cart.length === 0) {
+        alert("Seu carrinho está vazio!");
+        return;
+    }
+    // Redireciona para a rota que renderiza a tela de checkout
+    window.location.href = '/api/web/my-cart';
+}
+
     // --- LÓGICA DE TEMA ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const darkIcon = document.getElementById('theme-toggle-dark-icon');

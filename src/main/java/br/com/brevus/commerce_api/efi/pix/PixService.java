@@ -22,7 +22,7 @@ public class PixService {
 
     private final JSONObject configuracoes;
 
-    private static final String WEBHOOK_CHAVE = "";
+    private static final String WEBHOOK_CHAVE = "9644bbe4-8fed-40ee-b58d-21460b8f7d7d";
 
     @Value("${app.pix.webhook.url}")
     private String WEBHOOK_URL;

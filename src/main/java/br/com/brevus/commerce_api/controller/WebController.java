@@ -22,6 +22,9 @@ public class WebController {
         return "profile";
     }
 
+    @GetMapping("/api/web/my-cart")
+    public String myCart(){return "my-cart";}
+
     @GetMapping("/api/web/my-orders")
     public String myOrders(Model model){
         model.addAttribute("orders", List.of());

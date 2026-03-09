@@ -15,7 +15,7 @@
         } else {
             // Verificar se é ADMIN, senão redirecionar
             if (!AuthUtils.hasRole('ADMIN') && !AuthUtils.hasRole('SELLER')) {
-                window.location.href = '/api/web/home-user';
+                window.location.href = '/api/web/login';
             }
         }
     </script>

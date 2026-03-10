@@ -78,7 +78,7 @@ public class SecurityConfiguration {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
-                "/api/pix/**"
+                "/api/v1/pix/**"
         );
     }
 

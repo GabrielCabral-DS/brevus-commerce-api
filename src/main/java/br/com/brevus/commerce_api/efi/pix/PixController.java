@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping(value = "/api/pix", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/pix", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Payment Pix")
 public record PixController(PixService pixService) {
 

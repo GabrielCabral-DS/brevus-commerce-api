@@ -37,7 +37,7 @@ public class PixService {
         this.configuracoes.put("client_secret", pixConfig.clientSecret());
         this.configuracoes.put("sandbox", pixConfig.sandbox());
         this.configuracoes.put("debug", pixConfig.debug());
-        this.configuracoes.put("x-skip-mtls-checking", "true");
+        this.configuracoes.put("x-skip-mtls-checking", "false");
 
 
         try (InputStream certificadoStream = getClass()

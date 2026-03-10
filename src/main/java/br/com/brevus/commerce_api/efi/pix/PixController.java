@@ -39,14 +39,13 @@ public record PixController(PixService pixService) {
     }
 
     @PostMapping("/webhook")
-    @Operation(summary = "Receber", description = "Receber Webhook.")
-    public ResponseEntity<String> receberWebhook(
-            @RequestBody(required = false) String payload,
-            @RequestParam(value = "hmac", required = false) String hmac) {
-
+    public ResponseEntity<String> receberWebhook(@RequestBody String payload,
+                                                 @RequestParam(value = "hmac", required = false) String hmac) {
+        // Aqui você pode validar o HMAC, se quiser
         System.out.println("Webhook recebido (HMAC=" + hmac + "): " + payload);
 
-        return ResponseEntity.ok("ok");
+        // Retorne 200 OK para a Efí saber que recebeu
+        return ResponseEntity.ok("Webhook processado com sucesso");
     }
 
     @GetMapping("/list")

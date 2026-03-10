@@ -76,9 +76,10 @@ public class SecurityConfiguration {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
-                "/api/pix/**"
+                "/api/pix/webhook"
         );
     }
+
 
     @Bean
     public ObjectMapper objectMapper() {

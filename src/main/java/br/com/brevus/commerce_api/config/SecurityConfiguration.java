@@ -45,6 +45,7 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/pix/webhook",
                                 "/login",
                                 "/api/web/**",
                                 "/api/users/reset-password",
@@ -73,12 +74,14 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
+    /*@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
                 "/api/pix/webhook"
         );
     }
+
+     */
 
 
     @Bean

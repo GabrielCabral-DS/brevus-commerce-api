@@ -73,17 +73,12 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
-                "/api/v1/pix/**"
+                "/api/pix/**"
         );
     }
-
-
-
 
     @Bean
     public ObjectMapper objectMapper() {

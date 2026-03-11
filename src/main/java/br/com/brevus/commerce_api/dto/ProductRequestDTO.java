@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ProductRequestDTO(
-        UUID id,
 
         @NotBlank(message = "Product name is required.")
         @Size(min = 2, max = 150, message = "The name must be between 2 and 150 characters.")

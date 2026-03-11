@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api.model;
 
+import br.com.brevus.commerce_api.enums.State;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -10,32 +11,26 @@ import java.util.UUID;
 public class Address {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, length = 150)
     private String street;
 
-    @Column(nullable = false, length = 20)
     private String number;
 
-    @Column(length = 100)
     private String complement;
 
-    @Column(nullable = false, length = 100)
     private String neighborhood;
 
-    @Column(nullable = false, length = 100)
     private String city;
 
-    @Column(nullable = false, length = 100)
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private State state;
 
-    @Column(nullable = false, length = 20)
     private String zipCode;
 
     @Column(nullable = false)
@@ -50,7 +45,7 @@ public class Address {
 
     }
 
-    public Address(UUID id, User user, String street, String number, String complement, String neighborhood, String city, String state, String zipCode, LocalDateTime createdAt) {
+    public Address(UUID id, User user, String street, String number, String complement, String neighborhood, String city, State state, String zipCode, LocalDateTime createdAt) {
         this.id = id;
         this.user = user;
         this.street = street;
@@ -119,11 +114,11 @@ public class Address {
         this.city = city;
     }
 
-    public String getState() {
+    public State getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(State state) {
         this.state = state;
     }
 

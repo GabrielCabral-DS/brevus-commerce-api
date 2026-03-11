@@ -11,10 +11,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AddressMapper {
 
-    AddressRequestDTO toDTO(Address address);
-    Address toEntity(AddressRequestDTO addressRequestDTO);
-
     @Mapping(source = "user.id", target = "userId")
     AddressResponseDTO toResponseDto(Address address);
+
+
+    AddressRequestDTO toDTO(Address address);
+    Address toEntity(AddressRequestDTO addressRequestDTO);
     List<AddressResponseDTO> toDtoList(List<Address> addressList);
 }

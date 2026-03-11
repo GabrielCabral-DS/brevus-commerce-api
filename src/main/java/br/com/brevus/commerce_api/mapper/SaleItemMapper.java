@@ -15,9 +15,8 @@ public interface SaleItemMapper {
     @Mapping(source = "product.id", target = "productId")
     SaleItemResponseDTO toResponseDto(SaleItem saleItem);
 
+
     SaleItemRequestDTO toDTO(SaleItem saleItem);
-
     SaleItem toEntity(SaleItemRequestDTO saleItemRequestDTO);
-
     List<SaleItemResponseDTO> toDtoList(List<SaleItem> saleItemList);
 }

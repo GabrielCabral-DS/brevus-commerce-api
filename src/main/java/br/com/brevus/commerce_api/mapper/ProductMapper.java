@@ -11,14 +11,14 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    ProductRequestDTO toDTO(Product product);
-    Product toEntity(ProductRequestDTO dto);
-    List<ProductRequestDTO> toDtoList(List<Product> products);
-    List<Product> toEntityList(List<ProductRequestDTO> productRequestDTOList);
-
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
     ProductResponseDTO toResponseDto(Product product);
 
+
+    ProductRequestDTO toDTO(Product product);
+    Product toEntity(ProductRequestDTO dto);
+    List<ProductRequestDTO> toDtoList(List<Product> products);
+    List<Product> toEntityList(List<ProductRequestDTO> productRequestDTOList);
     List<ProductResponseDTO> toResponseDtoList(List<Product> products);
 }

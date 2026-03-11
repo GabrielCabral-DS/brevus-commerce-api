@@ -3,7 +3,6 @@ package br.com.brevus.commerce_api.efi.pix;
 import br.com.brevus.commerce_api.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,12 +20,20 @@ import java.util.UUID;
 @Slf4j
 @RequestMapping(value = "/api/pix", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Payment Pix")
-public record PixController(PixService pixService, PaymentService paymentService) {
+public class PixController {
 
     private static final Logger logger = LoggerFactory.getLogger(PixController.class);
 
+    private final PixService pixService;
+    private final PaymentService paymentService;
+
     @Value("${app.pix.webhook.hmac.retorno.api}")
-    private static String HMAC;
+    private String HMAC;
+
+    public PixController(PixService pixService, PaymentService paymentService) {
+        this.pixService = pixService;
+        this.paymentService = paymentService;
+    }
 
     @PostMapping
     @Operation(summary = "Payment", description = "Create Qr code by pix")

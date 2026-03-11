@@ -54,7 +54,7 @@ public class PixController {
         }
     }
 
-    @PostMapping("/webhook-pix")
+    /*@PostMapping("/webhook-pix")
     public ResponseEntity<String> receberWebhook(@RequestBody String payload,
                                                  @RequestParam(value = "hmac", required = false) String hmac) {
         // Aqui você pode validar o HMAC, se quiser
@@ -64,15 +64,14 @@ public class PixController {
         return ResponseEntity.ok("Webhook processado com sucesso");
     }
 
+     */
+
 
     @PostMapping("/webhook")
     @Operation(summary = "Receber", description = "Receber Webhook.")
     public ResponseEntity<String> receberWebhookPix(
             @RequestParam(name = "hmac") String hmac,
             @RequestBody String corpo) {
-
-        logger.info("HMAC recebido: {}", hmac);
-        logger.info("HMAC esperado: {}", HMAC);
 
         if (hmac == null || !hmac.equals(HMAC)) {
             logger.warn("HMAC inválido");

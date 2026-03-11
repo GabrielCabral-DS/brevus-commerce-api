@@ -1,6 +1,7 @@
 package br.com.brevus.commerce_api.service;
 
 import br.com.brevus.commerce_api.dto.PaymentResponseDTO;
+import br.com.brevus.commerce_api.enums.DeliveryStatus;
 import br.com.brevus.commerce_api.enums.PaymentMethod;
 import br.com.brevus.commerce_api.enums.PaymentStatus;
 import br.com.brevus.commerce_api.enums.SaleStatus;
@@ -51,6 +52,7 @@ public class PaymentService {
         payment.setConfirmedAt(LocalDateTime.now());
 
         sale.setStatus(SaleStatus.PAID);
+        sale.setDeliveryStatus(DeliveryStatus.PREPARANDO_PEDIDO);
 
         paymentRepository.save(payment);
         saleRepository.save(sale);

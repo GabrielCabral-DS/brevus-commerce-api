@@ -11,9 +11,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
 
+    @Mapping(source = "sale.id", target = "saleId")
     PaymentRequestDTO toDto(Payment payment);
     Payment toEntity(PaymentRequestDTO dto);
-    @Mapping(source = "sale.id", target = "saleId")
     List<PaymentResponseDTO> toDtoList(List<Payment> paymentList);
 
 }

@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public record SaleItemRequestDTO(
 
-        UUID id,
-
         @NotNull(message = "Sale ID is required.")
         UUID saleId,
 
@@ -31,5 +29,6 @@ public record SaleItemRequestDTO(
         @Positive(message = "Subtotal must be greater than zero.")
         @Digits(integer = 10, fraction = 2, message = "Subtotal must have up to 2 decimal places.")
         BigDecimal subtotal
+
 ) {
 }

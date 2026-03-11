@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api.model;
 
+import br.com.brevus.commerce_api.enums.DeliveryStatus;
 import br.com.brevus.commerce_api.enums.SaleStatus;
 import jakarta.persistence.*;
 
@@ -23,11 +24,17 @@ public class Sale {
 
     private BigDecimal totalAmount;
 
-    @Column(length = 50)
-    private String deliveryStatus;
+    @Enumerated(EnumType.STRING)
+    private DeliveryStatus deliveryStatus;
 
-    @Column(length = 100)
-    private String trackingCode;
+    @Column(name = "delivery_code", length = 6)
+    private String deliveryCode;
+
+    @Column(name = "delivery_code_confirmed")
+    private Boolean deliveryCodeConfirmed = false;
+
+    @Column(name = "delivery_code_confirmed_at")
+    private LocalDateTime deliveryCodeConfirmedAt;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
@@ -47,16 +54,23 @@ public class Sale {
     @OneToOne(mappedBy = "sale", cascade = CascadeType.ALL)
     private Payment payment;
 
+    @PrePersist
+    public void prePersist() {
+        this.saleDate = LocalDateTime.now();
+    }
+
     public Sale() {
     }
 
-    public Sale(UUID id, LocalDateTime saleDate, SaleStatus status, BigDecimal totalAmount, String deliveryStatus, String trackingCode, User client, User seller, Address deliveryAddress, List<SaleItem> items, Payment payment) {
+    public Sale(UUID id, LocalDateTime saleDate, SaleStatus status, BigDecimal totalAmount, DeliveryStatus deliveryStatus, String deliveryCode, Boolean deliveryCodeConfirmed, LocalDateTime deliveryCodeConfirmedAt, User client, User seller, Address deliveryAddress, List<SaleItem> items, Payment payment) {
         this.id = id;
         this.saleDate = saleDate;
         this.status = status;
         this.totalAmount = totalAmount;
         this.deliveryStatus = deliveryStatus;
-        this.trackingCode = trackingCode;
+        this.deliveryCode = deliveryCode;
+        this.deliveryCodeConfirmed = deliveryCodeConfirmed;
+        this.deliveryCodeConfirmedAt = deliveryCodeConfirmedAt;
         this.client = client;
         this.seller = seller;
         this.deliveryAddress = deliveryAddress;
@@ -96,20 +110,36 @@ public class Sale {
         this.totalAmount = totalAmount;
     }
 
-    public String getDeliveryStatus() {
+    public DeliveryStatus getDeliveryStatus() {
         return deliveryStatus;
     }
 
-    public void setDeliveryStatus(String deliveryStatus) {
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
     }
 
-    public String getTrackingCode() {
-        return trackingCode;
+    public String getDeliveryCode() {
+        return deliveryCode;
     }
 
-    public void setTrackingCode(String trackingCode) {
-        this.trackingCode = trackingCode;
+    public void setDeliveryCode(String deliveryCode) {
+        this.deliveryCode = deliveryCode;
+    }
+
+    public Boolean getDeliveryCodeConfirmed() {
+        return deliveryCodeConfirmed;
+    }
+
+    public void setDeliveryCodeConfirmed(Boolean deliveryCodeConfirmed) {
+        this.deliveryCodeConfirmed = deliveryCodeConfirmed;
+    }
+
+    public LocalDateTime getDeliveryCodeConfirmedAt() {
+        return deliveryCodeConfirmedAt;
+    }
+
+    public void setDeliveryCodeConfirmedAt(LocalDateTime deliveryCodeConfirmedAt) {
+        this.deliveryCodeConfirmedAt = deliveryCodeConfirmedAt;
     }
 
     public User getClient() {
@@ -152,4 +182,6 @@ public class Sale {
         this.payment = payment;
     }
 }
+
+
 

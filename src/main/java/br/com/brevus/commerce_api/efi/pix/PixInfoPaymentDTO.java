@@ -8,6 +8,11 @@ public class PixInfoPaymentDTO {
     private String descricaoProduto;
     private String valorProduto;
 
+
+    public PixInfoPaymentDTO(){
+
+    }
+
     public PixInfoPaymentDTO(String cpfPagador, String nomePagador, String descricaoProduto, String valorProduto) {
         this.cpfPagador = cpfPagador;
         this.nomePagador = nomePagador;

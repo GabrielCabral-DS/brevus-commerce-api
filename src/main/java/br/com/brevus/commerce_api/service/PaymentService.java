@@ -32,6 +32,11 @@ public class PaymentService {
 
 
     public void savePayment(UUID saleId, BigDecimal amount, String txid){
+
+        if(paymentRepository.existsBySaleId(saleId)){
+            throw new IllegalStateException("Já existe pagamento cadastrado para esta venda");
+        }
+
         Sale sale = saleRepository.findById(saleId)
                 .orElseThrow(()-> new ResourceNotFoundException("Sale not found"));
 

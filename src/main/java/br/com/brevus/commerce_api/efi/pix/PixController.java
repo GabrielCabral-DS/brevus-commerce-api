@@ -64,6 +64,9 @@ public record PixController(PixService pixService, PaymentService paymentService
             @RequestParam(name = "hmac") String hmac,
             @RequestBody String corpo) {
 
+        logger.info("HMAC recebido: {}", hmac);
+        logger.info("HMAC esperado: {}", HMAC);
+
         if (hmac == null || !hmac.equals(HMAC)) {
             logger.warn("HMAC inválido");
             return ResponseEntity.status(403).body("HMAC inválido");

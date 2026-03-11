@@ -6,8 +6,6 @@ import java.util.UUID;
 
 public record UserRoleRequestDTO(
 
-        UUID id,
-
         @NotNull(message = "The field cannot be null.")
         UUID userId,
 

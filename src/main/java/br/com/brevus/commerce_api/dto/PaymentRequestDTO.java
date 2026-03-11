@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public record PaymentRequestDTO(
 
-        UUID id,
-
         @NotNull(message = "Sale ID is required.")
         UUID saleId,
 
@@ -21,9 +19,9 @@ public record PaymentRequestDTO(
         @NotNull(message = "Payment status is required.")
         PaymentStatus status,
 
-        @NotBlank(message = "Transaction ID (txid) is required.")
-        @Size(max = 100, message = "Transaction ID cannot exceed 100 characters.")
-        String txid,
+        @NotBlank(message = "Transaction ID is required.")
+        @Size(max = 200, message = "Transaction ID cannot exceed 200 characters.")
+        String gatewayTransactionId,
 
         @NotNull(message = "Payment amount is required.")
         @Positive(message = "Payment amount must be greater than zero.")

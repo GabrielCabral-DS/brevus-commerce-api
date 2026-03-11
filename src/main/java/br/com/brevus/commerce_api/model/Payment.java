@@ -28,7 +28,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    private String txid;
+    @Column(name = "gateway_transaction_id")
+    private String gatewayTransactionId;
     private BigDecimal amount;
 
     private LocalDateTime createdAt;
@@ -37,12 +38,12 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(UUID id, Sale sale, PaymentMethod method, PaymentStatus status, String txid, BigDecimal amount, LocalDateTime createdAt, LocalDateTime confirmedAt) {
+    public Payment(UUID id, Sale sale, PaymentMethod method, PaymentStatus status, String gatewayTransactionId, BigDecimal amount, LocalDateTime createdAt, LocalDateTime confirmedAt) {
         this.id = id;
         this.sale = sale;
         this.method = method;
         this.status = status;
-        this.txid = txid;
+        this.gatewayTransactionId = gatewayTransactionId;
         this.amount = amount;
         this.createdAt = createdAt;
         this.confirmedAt = confirmedAt;
@@ -80,12 +81,12 @@ public class Payment {
         this.status = status;
     }
 
-    public String getTxid() {
-        return txid;
+    public String getGatewayTransactionId() {
+        return gatewayTransactionId;
     }
 
-    public void setTxid(String txid) {
-        this.txid = txid;
+    public void setGatewayTransactionId(String gatewayTransactionId) {
+        this.gatewayTransactionId = gatewayTransactionId;
     }
 
     public BigDecimal getAmount() {

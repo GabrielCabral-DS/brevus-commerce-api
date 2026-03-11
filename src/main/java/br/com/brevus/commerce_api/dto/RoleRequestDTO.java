@@ -6,8 +6,6 @@ import java.util.UUID;
 
 public record RoleRequestDTO(
 
-        UUID id,
-
         @NotBlank(message = "A role must be informed")
         String name
 

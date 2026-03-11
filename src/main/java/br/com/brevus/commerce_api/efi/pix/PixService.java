@@ -67,7 +67,7 @@ public class PixService {
         params.put("chave", WEBHOOK_CHAVE);
 
         JSONObject body = new JSONObject();
-        body.put("webhookUrl", WEBHOOK_URL + HMAC);
+        body.put("webhookUrl", WEBHOOK_URL + "?hmac=" + HMAC);
 
         try {
             EfiPay efi = new EfiPay(configuracoes);

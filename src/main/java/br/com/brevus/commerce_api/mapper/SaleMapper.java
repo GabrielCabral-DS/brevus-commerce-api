@@ -11,11 +11,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {SaleItemMapper.class, PaymentMapper.class})
 public interface SaleMapper {
 
-    SaleRequestDTO toDTO(Sale sale);
-    Sale toEntity(SaleRequestDTO dto);
-    List<SaleResponseDTO> toDtoList(List<Sale> sales);
     @Mapping(source = "client.id", target = "clientId")
     @Mapping(source = "seller.id", target = "sellerId")
     @Mapping(source = "deliveryAddress.id", target = "addressId")
     SaleResponseDTO toResponseDto(Sale sale);
+
+    SaleRequestDTO toDTO(Sale sale);
+    Sale toEntity(SaleRequestDTO dto);
+    List<SaleResponseDTO> toDtoList(List<Sale> sales);
 }

@@ -8,11 +8,12 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = {SaleMapper.class})
 public interface PaymentMapper {
 
     @Mapping(source = "sale.id", target = "saleId")
     PaymentRequestDTO toDto(Payment payment);
+
     Payment toEntity(PaymentRequestDTO dto);
     List<PaymentResponseDTO> toDtoList(List<Payment> paymentList);
 

@@ -39,7 +39,7 @@ public class ProductController {
     @GetMapping("/all")
     public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String categoryId) {
 

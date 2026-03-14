@@ -13,6 +13,10 @@ import br.com.brevus.commerce_api.repository.ProductRepository;
 import br.com.brevus.commerce_api.repository.SaleRepository;
 import br.com.brevus.commerce_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -53,16 +57,13 @@ public class SaleService {
         User userClient = userRepository.findById(dto.clientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 
-        User userSeller = userRepository.findById(dto.sellerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Prestador não encontrado"));
-
         Address address = addressRepository.findById(dto.addressId())
                 .orElseThrow(() -> new ResourceNotFoundException("Endereço não encontrado"));
 
         String deliveryCode = generateDeliveryCode();
 
         sale.setClient(userClient);
-        sale.setSeller(userSeller);
+        sale.setSeller(null);
         sale.setDeliveryCode(deliveryCode);
         sale.setDeliveryAddress(address);
         sale.setStatus(SaleStatus.PENDING);
@@ -120,5 +121,12 @@ public class SaleService {
         return saleMapper.toDtoList(saleResponseDTOList);
     }
 
+    public Page<SaleResponseDTO> listAllSalesByClientId(UUID clientId, int page, int size){
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("saleDate").descending());
+
+        Page<Sale> salePage = saleRepository.findAllByClientId(clientId, pageable);
+
+        return salePage.map(saleMapper::toResponseDto);
+    }
 }

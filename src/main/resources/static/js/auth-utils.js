@@ -166,7 +166,7 @@ class AuthUtils {
 
       if (response.ok) {
         const data = await response.json();
-        this.setTokens(data.accessToken, data.refreshTokenToken);
+        this.setTokens(data.accessToken, data.refreshToken || data.refreshTokenToken);
         return true;
       }
     } catch (error) {

@@ -1,0 +1,2 @@
+ALTER TABLE sales
+ADD COLUMN delivery_status VARCHAR(100) NOT NULL;

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Brevus Commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (!AuthUtils.isAuthenticated() || !AuthUtils.hasRole('CLIENT')) {
+            window.location.href = '/api/web/login';
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
+
+<nav class="bg-white dark:bg-slate-800 shadow-md sticky top-0 z-50 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-800 dark:text-white">
+                    Brevus <span class="text-indigo-600">Commerce</span>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="/api/web/products-client" class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 font-medium">Produtos</a>
+                <a href="/api/web/my-orders" class="text-slate-600 dark:text-slate-300 hover:text-indigo-600 font-medium">Meus Pedidos</a>
+
+                <a href="/api/web/cart" class="relative text-slate-600 dark:text-slate-300 hover:text-indigo-600 p-2 transition-transform hover:scale-110" onclick="toggleCartDrawer(event)">
+                    <i class="fa-solid fa-shopping-cart text-lg"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-800">0</span>
+                </a>
+
+                <button id="theme-toggle" class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-full transition-all">
+                    <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
+                    <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
+                </button>
+
+                <div class="relative flex items-center gap-3">
+                    <div class="text-right hidden lg:block">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Bem vindo,</p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-white" id="userName">Cliente</p>
+                    </div>
+                    <div id="userMenu" class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold border-2 border-indigo-500 cursor-pointer hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors">
+                        <span id="userInitial">C</span>
+                    </div>
+                    <div id="userDropdown" class="hidden absolute top-14 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg w-52 overflow-hidden z-50">
+                        <a href="/api/web/profile-client" class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700"><i class="fa-solid fa-user mr-2"></i>Meu Perfil</a>
+                        <button onclick="AuthUtils.logout()" class="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700"><i class="fa-solid fa-sign-out-alt mr-2"></i>Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <header class="mb-12">
+        <div class="bg-gradient-to-r from-indigo-600 to-violet-700 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden">
+            <div class="relative z-10 max-w-2xl">
+                <h2 class="text-4xl font-extrabold mb-4">Tecnologia em cada detalhe.</h2>
+                <p class="text-indigo-100 text-lg mb-6">Explore produtos premium com controle de estoque real.</p>
+                <a href="/api/web/products-client" class="bg-white text-indigo-600 px-8 py-3 rounded-xl font-bold hover:bg-slate-100 transition-all inline-flex items-center gap-2">Ver Catálogo <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <i class="fa-solid fa-box-open absolute right-[-50px] bottom-[-50px] text-[20rem] opacity-10 rotate-12"></i>
+        </div>
+    </header>
+
+    <div class="mb-12">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Atividade Recente</h3>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="bg-amber-100 text-amber-700 p-4 rounded-2xl dark:bg-amber-900/30 dark:text-amber-400"><i class="fa-solid fa-receipt text-xl"></i></div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Pedido Pendente</p>
+                    <p class="text-lg font-bold text-slate-800 dark:text-white">Aguardando Pagamento (PIX)</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all">Pagar Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-8 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> Lançamentos</h3>
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Products will be loaded here via JavaScript -->
+    </div>
+</main>
+
+<!-- CART DRAWER -->
+<div id="cartDrawer" class="fixed inset-0 z-[110] hidden">
+    <div onclick="toggleCartDrawer()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+    <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full" id="cartContent">
+        <div class="p-6 border-b dark:border-slate-700 flex justify-between items-center">
+            <h2 class="text-xl font-black dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-cart-shopping text-indigo-600"></i> Meu Carrinho
+            </h2>
+            <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div id="drawerItems" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div class="p-6 border-t dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-slate-500 dark:text-slate-400 font-bold">Total:</span>
+                <span id="drawerTotal" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">R$ 0,00</span>
+            </div>
+            <button onclick="goToMyCart()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black text-lg shadow-lg transition-all flex items-center justify-center gap-2">
+                Ir para o Carrinho <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // --- TEMA ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+    function updateTheme() {
+        const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', isDark);
+        lightIcon.classList.toggle('hidden', !isDark);
+        darkIcon.classList.toggle('hidden', isDark);
+    }
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        updateTheme();
+    });
+    updateTheme();
+
+    // --- USUÁRIO ---
+    const userInfo = AuthUtils.getUserInfo();
+    if (userInfo?.name) {
+        document.getElementById('userName').textContent = userInfo.name;
+        document.getElementById('userInitial').textContent = userInfo.name.charAt(0).toUpperCase();
+    }
+    const userMenu = document.getElementById('userMenu');
+    const dropdown = document.getElementById('userDropdown');
+    userMenu.addEventListener('click', () => dropdown.classList.toggle('hidden'));
+    document.addEventListener('click', (e) => { if (!userMenu.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden'); });
+
+    // --- CARRINHO (IGUAL AO PRODUCTS) ---
+    let cart = JSON.parse(localStorage.getItem('brevus_cart')) || [];
+
+    function updateCartCount() {
+        const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+        document.getElementById("cartCount").textContent = totalItems;
+    }
+
+    function toggleCartDrawer(event) {
+        if (event) event.preventDefault();
+        const drawer = document.getElementById('cartDrawer');
+        const content = document.getElementById('cartContent');
+        if (drawer.classList.contains('hidden')) {
+            renderDrawerItems();
+            drawer.classList.remove('hidden');
+            setTimeout(() => content.classList.remove('translate-x-full'), 10);
+        } else {
+            content.classList.add('translate-x-full');
+            setTimeout(() => drawer.classList.add('hidden'), 300);
+        }
+    }
+
+    function renderDrawerItems() {
+        const container = document.getElementById('drawerItems');
+        let total = 0;
+
+        if (cart.length === 0) {
+            container.innerHTML = `<div class="text-center py-10 text-slate-500">Carrinho vazio</div>`;
+            document.getElementById('drawerTotal').textContent = "R$ 0,00";
+            return;
+        }
+
+        container.innerHTML = cart.map(item => {
+            const sub = item.price * item.quantity;
+            total += sub;
+            return `
+                <div class="flex gap-4 bg-slate-50 dark:bg-slate-700/30 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 items-center">
+                    <img src="${item.imageUrl || item.imagePath || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-xl bg-white">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm dark:text-white line-clamp-1">${item.name}</h4>
+                        <p class="font-black text-indigo-600 text-sm mb-2">R$ ${sub.toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
+
+                        <div class="flex items-center gap-3">
+                            <button onclick="updateQuantity('${item.id}', -1)"
+                                    class="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-600 flex items-center justify-center hover:bg-red-50 hover:border-red-200 hover:text-red-500 dark:hover:bg-red-900/30 transition-all">
+                                <i class="fa-solid fa-minus text-[10px]"></i>
+                            </button>
+                            <span class="font-bold text-sm dark:text-white w-4 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.id}', 1)"
+                                    class="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-600 flex items-center justify-center hover:bg-green-50 hover:border-green-200 hover:text-green-500 dark:hover:bg-green-900/30 transition-all">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart('${item.id}')" class="text-slate-300 hover:text-red-500 ml-2">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>`;
+        }).join('');
+
+        document.getElementById('drawerTotal').textContent = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+    }
+
+    function updateQuantity(id, change) {
+        const idx = cart.findIndex(item => item.id === id);
+
+        if (idx > -1) {
+            cart[idx].quantity += change;
+
+            // Se a quantidade for menor ou igual a zero, removemos o produto
+            if (cart[idx].quantity <= 0) {
+                cart.splice(idx, 1);
+            }
+
+            saveCart();
+            renderDrawerItems(); // Re-renderiza a lista no drawer
+        }
+    }
+
+    function addToCart(id, name, price, imageUrl) {
+        const idx = cart.findIndex(i => i.id === id);
+        if(idx > -1) {
+            cart[idx].quantity++;
+        } else {
+            cart.push({
+                id: id,
+                name: name,
+                price: price,
+                imageUrl: imageUrl,
+                quantity: 1
+            });
+        }
+        saveCart();
+
+        // FEEDBACK VISUAL: Faz o ícone do carrinho dar um pulinho
+        const cartBtn = document.querySelector('a[onclick="toggleCartDrawer(event)"]');
+        cartBtn.classList.add('scale-125', 'text-indigo-600');
+
+        // Remove a animação após 300ms
+        setTimeout(() => {
+            cartBtn.classList.remove('scale-125', 'text-indigo-600');
+        }, 300);
+
+        // Opcional: Um mini-toast ou log discreto (removendo o alert que trava a tela)
+        console.log(`${name} adicionado!`);
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(i => i.id !== id);
+        saveCart();
+        renderDrawerItems();
+    }
+
+    function saveCart() {
+        localStorage.setItem('brevus_cart', JSON.stringify(cart));
+        updateCartCount();
+    }
+
+    function goToMyCart() {
+        window.location.href = '/api/web/my-cart';
+    }
+
+    // --- PRODUTOS RECENTES ---
+    async function loadRecentProducts() {
+        try {
+            const response = await AuthUtils.authenticatedFetch('/api/products/recents');
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            const products = await response.json();
+            renderProducts(products);
+        } catch (error) {
+            console.error('Erro ao carregar produtos recentes:', error);
+            // Fallback: mostrar mensagem de erro
+            document.getElementById('productsGrid').innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <i class="fa-solid fa-exclamation-triangle text-4xl text-slate-400 mb-4"></i>
+                    <p class="text-slate-500 dark:text-slate-400">Erro ao carregar produtos recentes</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderProducts(products) {
+        const grid = document.getElementById('productsGrid');
+
+        if (!products || products.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <i class="fa-solid fa-box-open text-4xl text-slate-400 mb-4"></i>
+                    <p class="text-slate-500 dark:text-slate-400">Nenhum produto recente encontrado</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = products.map(product => `
+            <div class="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-2xl transition-all group flex flex-col">
+                <div class="relative h-56 bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                    <img src="${product.imagePath || 'https://via.placeholder.com/500'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    ${product.stockQuantity <= 0 ? '<div class="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center"><span class="bg-white text-slate-900 px-4 py-1 rounded-full font-black text-xs">ESGOTADO</span></div>' : ''}
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <p class="text-[10px] text-indigo-600 dark:text-indigo-400 font-black uppercase mb-2 tracking-widest">${product.categoryName || 'Premium'}</p>
+                    <h4 class="text-lg font-bold text-slate-800 dark:text-white mb-2 leading-tight">${product.name}</h4>
+                    <div class="mt-auto pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Preço</p>
+                            <span class="text-xl font-black text-slate-900 dark:text-white">R$ ${product.price.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>
+                        <button onclick="addToCart('${product.id}', '${product.name.replace(/'/g, "\\'")}', ${product.price}, '${product.imagePath || ''}')"
+                                ${product.stockQuantity <= 0 ? 'disabled' : ''}
+                                class="bg-indigo-600 text-white h-12 w-12 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-30 disabled:grayscale">
+                            <i class="fa-solid fa-plus text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartCount();
+        loadRecentProducts();
+    });
+</script>
+</body>
+</html>

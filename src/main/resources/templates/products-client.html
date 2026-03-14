@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brevus Shop | Nossos Produtos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+
+        // Inicialização do tema
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Proteção de Rota
+        if (!AuthUtils.isAuthenticated()) {
+            window.location.href = '/api/web/login';
+        } else if (!AuthUtils.hasRole('CLIENT')) {
+            window.location.href = '/api/web/login';
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
+
+<nav class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <a href="/api/web/home-user" class="text-slate-500 hover:text-indigo-600 transition-colors">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <div class="flex items-center gap-2 font-bold text-2xl text-indigo-600">
+                <i class="fa-solid fa-store"></i> <span>Brevus<span class="text-slate-800 dark:text-white text-lg">Shop</span></span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button id="theme-toggle" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
+                <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
+            </button>
+
+            <button onclick="toggleCartDrawer()" class="relative p-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition-all">
+                <i class="fa-solid fa-cart-shopping text-xl"></i>
+                <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300">0</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-10 text-center">
+        <h1 class="text-3xl font-black text-slate-800 dark:text-white mb-2">Explore nossos Produtos</h1>
+        <p class="text-slate-500 dark:text-slate-400">Encontre o que você precisa com os melhores preços.</p>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-12">
+        <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchInput" oninput="debounceSearch()" placeholder="O que você está procurando hoje?"
+                   class="w-full pl-11 pr-4 py-3 rounded-2xl border-none bg-white dark:bg-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700 dark:text-white">
+        </div>
+
+        <select id="filterCategory" onchange="filterByCategory()"
+                class="md:w-64 px-4 py-3 rounded-2xl border-none bg-white dark:bg-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-slate-600 dark:text-slate-300">
+            <option value="">Todas as Categorias</option>
+        </select>
+    </div>
+
+    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+
+    <div class="mt-12 flex items-center justify-center gap-4">
+        <button id="prevPage" onclick="changePage(-1)" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center disabled:opacity-30 hover:text-indigo-600 transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span id="pageNumber" class="font-bold text-slate-700 dark:text-slate-300">Página 1</span>
+        <button id="nextPage" onclick="changePage(1)" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center disabled:opacity-30 hover:text-indigo-600 transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+</main>
+
+<div id="cartDrawer" class="fixed inset-0 z-[110] hidden">
+    <div onclick="toggleCartDrawer()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+    <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl flex flex-col transition-transform duration-300 translate-x-full" id="cartContent">
+        <div class="p-6 border-b dark:border-slate-700 flex justify-between items-center">
+            <h2 class="text-xl font-black dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-cart-shopping text-indigo-600"></i> Meu Carrinho
+            </h2>
+            <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div id="drawerItems" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div class="p-6 border-t dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-slate-500 dark:text-slate-400 font-bold">Total:</span>
+                <span id="drawerTotal" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">R$ 0,00</span>
+            </div>
+            <button onclick="goToMyCart()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black text-lg shadow-lg transition-all flex items-center justify-center gap-2">
+                Ir para o Carrinho <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="productModal" class="hidden fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+        <div class="md:w-1/2 bg-slate-100 dark:bg-slate-700 flex items-center justify-center p-8">
+            <img id="modalImg" src="" class="max-h-64 object-contain drop-shadow-xl">
+        </div>
+        <div class="md:w-1/2 p-8 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <span id="modalCat" class="text-[10px] uppercase font-bold tracking-widest text-indigo-500">Categoria</span>
+            <h2 id="modalTitle" class="text-2xl font-black text-slate-800 dark:text-white mt-1 mb-4 leading-tight"></h2>
+            <p id="modalDesc" class="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed"></p>
+            <div class="flex items-center justify-between mt-auto">
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold">Preço</p>
+                    <p id="modalPrice" class="text-3xl font-black text-indigo-600 dark:text-indigo-400"></p>
+                </div>
+                <button id="addBtnModal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg">
+                    Adicionar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 0;
+    const pageSize = 8;
+    let searchQuery = '';
+    let selectedCategory = '';
+    let cart = JSON.parse(localStorage.getItem('brevus_cart')) || [];
+
+    // --- TEMA ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+    function updateThemeIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        darkIcon.classList.toggle('hidden', isDark);
+        lightIcon.classList.toggle('hidden', !isDark);
+    }
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        updateThemeIcons();
+    });
+    updateThemeIcons();
+
+    // --- PRODUTOS ---
+    async function loadProducts() {
+        try {
+            const url = `/api/products/all?page=${currentPage}&size=${pageSize}&search=${encodeURIComponent(searchQuery)}&categoryId=${selectedCategory}`;
+            const res = await AuthUtils.authenticatedFetch(url);
+            const data = await res.json();
+            renderGrid(data.content || []);
+            updateUI(data);
+        } catch (e) { console.error("Erro produtos:", e); }
+    }
+
+    function renderGrid(products) {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = products.map(p => `
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 shadow-sm hover:shadow-xl transition-all group border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900/50">
+                <div onclick='openDetails(${JSON.stringify(p)})' class="cursor-pointer">
+                    <div class="relative bg-slate-50 dark:bg-slate-700/50 rounded-2xl h-48 flex items-center justify-center mb-4 overflow-hidden">
+                        <img src="${p.imageUrl || p.imagePath || 'https://via.placeholder.com/150'}" class="max-h-32 group-hover:scale-110 transition-transform duration-500">
+                        <span class="absolute top-2 left-2 bg-white/80 dark:bg-slate-800/80 px-2 py-1 rounded-lg text-[10px] font-bold text-slate-500">${p.categoryName || 'Produto'}</span>
+                    </div>
+                    <h3 class="font-bold text-slate-800 dark:text-white truncate mb-1">${p.name}</h3>
+                    <p class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mb-4">R$ ${p.price.toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
+                </div>
+                <button onclick='addToCart(${JSON.stringify(p)})' class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-indigo-600 hover:text-white text-slate-600 dark:text-slate-300 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cart-plus"></i> Adicionar
+                </button>
+            </div>
+        `).join('');
+    }
+
+    // --- CARRINHO ---
+    function toggleCartDrawer() {
+        const drawer = document.getElementById('cartDrawer');
+        const content = document.getElementById('cartContent');
+        if (drawer.classList.contains('hidden')) {
+            renderDrawerItems();
+            drawer.classList.remove('hidden');
+            setTimeout(() => content.classList.remove('translate-x-full'), 10);
+        } else {
+            content.classList.add('translate-x-full');
+            setTimeout(() => drawer.classList.add('hidden'), 300);
+        }
+    }
+
+    function renderDrawerItems() {
+    const container = document.getElementById('drawerItems');
+    let total = 0;
+
+    if (cart.length === 0) {
+        container.innerHTML = `<div class="text-center py-10 text-slate-500">Carrinho vazio</div>`;
+        document.getElementById('drawerTotal').textContent = "R$ 0,00";
+        return;
+    }
+
+    container.innerHTML = cart.map(item => {
+        const sub = item.price * item.quantity;
+        total += sub;
+        return `
+            <div class="flex gap-4 bg-slate-50 dark:bg-slate-700/30 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 items-center">
+                <img src="${item.imageUrl || item.imagePath || 'https://via.placeholder.com/80'}" class="w-16 h-16 object-cover rounded-xl bg-white">
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm dark:text-white line-clamp-1">${item.name}</h4>
+                    <p class="font-black text-indigo-600 text-sm mb-2">R$ ${sub.toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
+
+                    <div class="flex items-center gap-3">
+                        <button onclick="updateQuantity('${item.id}', -1)"
+                                class="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-600 flex items-center justify-center hover:bg-red-50 hover:border-red-200 hover:text-red-500 dark:hover:bg-red-900/30 transition-all">
+                            <i class="fa-solid fa-minus text-[10px]"></i>
+                        </button>
+                        <span class="font-bold text-sm dark:text-white w-4 text-center">${item.quantity}</span>
+                        <button onclick="updateQuantity('${item.id}', 1)"
+                                class="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-600 flex items-center justify-center hover:bg-green-50 hover:border-green-200 hover:text-green-500 dark:hover:bg-green-900/30 transition-all">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+                <button onclick="removeFromCart('${item.id}')" class="text-slate-300 hover:text-red-500 ml-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>`;
+    }).join('');
+
+    document.getElementById('drawerTotal').textContent = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+}
+
+    function updateQuantity(id, change) {
+    const idx = cart.findIndex(item => item.id === id);
+
+    if (idx > -1) {
+        cart[idx].quantity += change;
+
+        // Se a quantidade for menor ou igual a zero, removemos o produto
+        if (cart[idx].quantity <= 0) {
+            cart.splice(idx, 1);
+        }
+
+        saveCart();
+        renderDrawerItems(); // Re-renderiza a lista no drawer
+    }
+}
+
+    function addToCart(p) {
+    const idx = cart.findIndex(i => i.id === p.id);
+    if(idx > -1) {
+        cart[idx].quantity++;
+    } else {
+        cart.push({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            imageUrl: p.imageUrl || p.imagePath,
+            quantity: 1,
+            sellerId: p.sellerId
+        });
+    }
+    saveCart();
+
+    // FEEDBACK VISUAL: Faz o ícone do carrinho dar um pulinho
+    const cartBtn = document.querySelector('button[onclick="toggleCartDrawer()"]');
+    cartBtn.classList.add('scale-125', 'text-indigo-600');
+
+    // Remove a animação após 300ms
+    setTimeout(() => {
+        cartBtn.classList.remove('scale-125', 'text-indigo-600');
+    }, 300);
+
+    // Opcional: Um mini-toast ou log discreto (removendo o alert que trava a tela)
+    console.log(`${p.name} adicionado!`);
+}
+
+    function removeFromCart(id) { cart = cart.filter(i => i.id !== id); saveCart(); renderDrawerItems(); }
+    function saveCart() {
+        localStorage.setItem('brevus_cart', JSON.stringify(cart));
+        document.getElementById('cartCount').textContent = cart.reduce((acc, i) => acc + i.quantity, 0);
+    }
+    function goToMyCart() { window.location.href = '/api/web/my-cart'; }
+
+    // --- OUTROS ---
+    function openDetails(p) {
+        document.getElementById('modalImg').src = p.imageUrl || p.imagePath;
+        document.getElementById('modalTitle').textContent = p.name;
+        document.getElementById('modalPrice').textContent = `R$ ${p.price.toLocaleString('pt-BR')}`;
+        document.getElementById('modalCat').textContent = p.categoryName;
+        document.getElementById('addBtnModal').onclick = () => addToCart(p);
+        document.getElementById('productModal').classList.remove('hidden');
+    }
+    function closeModal() { document.getElementById('productModal').classList.add('hidden'); }
+    function updateUI(data) {
+        document.getElementById('pageNumber').textContent = `Página ${(data.number || 0) + 1} de ${data.totalPages || 1}`;
+        document.getElementById('prevPage').disabled = data.first;
+        document.getElementById('nextPage').disabled = data.last;
+    }
+    function changePage(s) { currentPage += s; loadProducts(); }
+    function filterByCategory() { selectedCategory = document.getElementById('filterCategory').value; currentPage = 0; loadProducts(); }
+    let timer;
+    function debounceSearch() {
+        clearTimeout(timer);
+        timer = setTimeout(() => { searchQuery = document.getElementById('searchInput').value; currentPage = 0; loadProducts(); }, 500);
+    }
+    async function loadCategories() {
+        try {
+            const res = await AuthUtils.authenticatedFetch('/api/categories');
+            const cats = await res.json();
+            const select = document.getElementById('filterCategory');
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id; opt.textContent = c.name;
+                select.appendChild(opt);
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    saveCart();
+    loadCategories();
+    loadProducts();
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+ALTER TABLE sales DROP COLUMN IF EXISTS image_path;
+
+ALTER TABLE products ADD COLUMN image_path VARCHAR(255);

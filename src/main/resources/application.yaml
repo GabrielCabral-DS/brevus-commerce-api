@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: commerce-api
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  jpa:
+    open-in-view: false
+    hibernate:
+#      ddl-auto: update # Recomendo deixar update enquanto desenvolve
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${ENVIO_EMAIL_USERNAME}
+    password: ${ENVIO_EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID}
+            client-secret: ${FACEBOOK_CLIENT_SECRET}
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+
+app:
+  pix:
+    clientId: ${EFIBANK_CLIENT_ID}
+    clientSecret: ${EFIBANK_CLIENT_SECRET}
+    certificatePath: certificate/producao-854204-commerce-api.p12
+    sandbox: false
+    debug: true
+    webhook:
+      chave: ${EFIBANK_CHAVE_PIX_WEBHOOK}
+      hmac:
+        api: ${EFIBANK_HMAC_WEBHOOK}
+        retorno:
+          api: ${EFIBANK_HMAC_RETORNO_API_WEBHOOK}
+      url: ${EFIBANK_URL_PIX_WEBHOOK}
+
+springdoc:
+  override-with-generic-response: false
+
+logging:
+  level:
+    org.hibernate.orm.connections.pooling: WARN
+  pattern:
+    console: '%clr(%d{dd-MM-yyyy HH:mm:ss}){blue} %clr(%5p) %clr([%t]){faint} %clr(%-40.40logger){cyan} %clr(:){yellow} %m%n'

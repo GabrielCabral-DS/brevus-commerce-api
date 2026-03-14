@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autenticando...</title>
+    <script src="/js/auth-utils.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        p {
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>Autenticando...</h1>
+        <p>Redirecting you to your dashboard...</p>
+    </div>
+
+    <script>
+        // A resposta do OAuth2 handler já foi escrita como JSON
+        // Tentamos obter os tokens da resposta
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aguardar um pouco para garantir que a resposta foi processada
+            setTimeout(function() {
+                // Os tokens devem estar armazenados pelo OAuth2Handler
+                if (AuthUtils.isAuthenticated()) {
+                    // Usuário já autenticado, redirecionar baseado na role
+                    AuthUtils.redirectByRole();
+                } else {
+                    // Se não estiver autenticado, tentar obter do sessionStorage (caso tenha sido armazenado)
+                    const responseText = sessionStorage.getItem('oauthResponse');
+                    if (responseText) {
+                        try {
+                            const data = JSON.parse(responseText);
+                            AuthUtils.setTokens(data.accessToken, data.refreshTokenToken);
+                            sessionStorage.removeItem('oauthResponse');
+                            AuthUtils.redirectByRole();
+                        } catch (error) {
+                            console.error('Erro ao processar resposta OAuth2:', error);
+                            window.location.href = '/api/web/login';
+                        }
+                    } else {
+                        // Falha na autenticação
+                        console.error('Nenhum token encontrado');
+                        window.location.href = '/api/web/login';
+                    }
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

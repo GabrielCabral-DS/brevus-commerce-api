@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar | Brevus Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/auth-utils.js"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    // 1. Verifica se está logado
+    if (!AuthUtils.isAuthenticated()) {
+    window.location.href = '/api/web/login';
+    }
+    // 2. Se estiver logado, verifica se tem a permissão necessária
+    else {
+    const isAdmin = AuthUtils.hasRole('ADMIN');
+    const isSeller = AuthUtils.hasRole('SELLER');
+
+    // Se NÃO for admin E NÃO for seller, ele é um intruso nesta página
+    if (!isAdmin && !isSeller) {
+        window.location.href = '/api/web/login';
+    }
+}
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
+
+<nav class="bg-white dark:bg-slate-800 shadow-md sticky top-0 z-50 transition-colors">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='/api/web/home-manager'">
+        <div class="bg-indigo-600 p-2 rounded-lg text-white">
+          <i class="fa-solid fa-arrow-left"></i>
+        </div>
+        <span class="text-xl font-bold text-slate-800 dark:text-white">Admin <span class="text-indigo-600">Brevus</span></span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle" class="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:ring-2 hover:ring-indigo-500 transition-all">
+          <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
+          <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
+        </button>
+        <button onclick="openCategoryModal()" class="border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg font-bold hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2">
+          <i class="fa-solid fa-tags"></i> <span class="hidden sm:inline">Categoria</span>
+        </button>
+        <button onclick="openModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg">
+          <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Produto</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Inventário</h2>
+      <p class="text-slate-500 dark:text-slate-400">Gerencie produtos, estoque e categorias.</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <div class="relative flex-1 sm:w-64">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input type="text" id="adminSearch" oninput="debounceSearch()" placeholder="Pesquisar produto..."
+               class="w-full pl-9 pr-4 py-2.5 rounded-xl border dark:border-slate-700 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm">
+      </div>
+      <select id="adminFilterCategory" onchange="filterByCategory()"
+              class="px-4 py-2.5 rounded-xl border dark:border-slate-700 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm">
+        <option value="">Todas Categorias</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mb-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+    <div class="flex items-center gap-2 mb-4">
+      <i class="fa-solid fa-layer-group text-indigo-600"></i>
+      <h3 class="font-bold text-slate-800 dark:text-white">Categorias</h3>
+    </div>
+
+    <div id="inlineEditContainer" class="hidden mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800">
+      <div class="flex gap-2">
+        <input type="hidden" id="editCatId">
+        <input type="text" id="editCatName" class="flex-1 px-4 py-2 rounded-lg border dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+        <button onclick="saveCategoryEdit()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold">Salvar</button>
+        <button onclick="cancelCategoryEdit()" class="px-4 py-2 text-slate-500">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="categoryBadgeList" class="flex flex-wrap gap-2"></div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-slate-50 dark:bg-slate-700/50 border-b dark:border-slate-700">
+        <tr>
+          <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Produto</th>
+          <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Categoria</th>
+          <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Estoque</th>
+          <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Preço</th>
+          <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
+        </tr>
+        </thead>
+        <tbody id="productTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+      </table>
+    </div>
+
+    <div class="px-6 py-4 bg-slate-50 dark:bg-slate-700/30 border-t dark:border-slate-700 flex items-center justify-between">
+      <span id="paginationInfo" class="text-sm text-slate-500 dark:text-slate-400 font-medium"></span>
+      <div class="flex gap-2">
+        <button id="prevBtn" onclick="changePage(-1)" class="p-2 rounded-lg bg-white dark:bg-slate-800 border dark:border-slate-600 disabled:opacity-30">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button id="nextBtn" onclick="changePage(1)" class="p-2 rounded-lg bg-white dark:bg-slate-800 border dark:border-slate-600 disabled:opacity-30">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="categoryModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700">
+    <div class="p-6 border-b dark:border-slate-700 flex justify-between items-center">
+      <h3 class="text-xl font-bold text-slate-800 dark:text-white">Nova Categoria</h3>
+      <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <form id="categoryForm" class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome</label>
+        <input type="text" id="catName" required placeholder="Ex: Bebidas" class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <button type="submit" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold hover:bg-emerald-700 transition-all">Salvar Categoria</button>
+    </form>
+  </div>
+</div>
+
+<div id="productModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700">
+    <div class="p-6 border-b dark:border-slate-700 flex justify-between items-center">
+      <h3 id="modalTitle" class="text-xl font-bold text-slate-800 dark:text-white">Novo Produto</h3>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <form id="productForm" class="p-6 space-y-4">
+      <input type="hidden" id="productId">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome</label>
+        <input type="text" id="name" required class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Descrição</label>
+        <textarea id="description" rows="2" class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400" placeholder="Breve descrição do produto..."></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Categoria</label>
+        <select id="categoryId" required class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Preço</label>
+          <input type="number" step="0.01" id="price" required class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Estoque</label>
+          <input type="number" id="stockQuantity" required class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">URL Imagem</label>
+        <input type="text" id="imagePath" class="w-full px-4 py-2 rounded-lg border dark:border-slate-600 dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 shadow-lg">Salvar Produto</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const API_URL = '/api/products';
+  const CAT_URL = '/api/categories';
+
+  let currentPage = 0;
+  const pageSize = 5;
+  let searchQuery = '';
+  let selectedCategoryId = '';
+
+  // --- TEMA ---
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  const darkIcon = document.getElementById('theme-toggle-dark-icon');
+  const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+  function updateIcons() {
+      if (document.documentElement.classList.contains('dark')) {
+          lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden');
+      } else {
+          darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden');
+      }
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      updateIcons();
+  });
+
+  // --- PRODUTOS ---
+  async function loadProducts() {
+      try {
+          const url = `${API_URL}/all?page=${currentPage}&size=${pageSize}&search=${encodeURIComponent(searchQuery)}&categoryId=${selectedCategoryId}`;
+          const res = await AuthUtils.authenticatedFetch(url);
+          const data = await res.json();
+          renderProductTable(data.content || []);
+          updatePagination(data);
+      } catch (err) { console.error(err); }
+  }
+
+  function renderProductTable(products) {
+      const tbody = document.getElementById('productTableBody');
+      if (products.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">Nenhum produto encontrado.</td></tr>`;
+          return;
+      }
+      tbody.innerHTML = products.map(p => `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+              <td class="px-6 py-4 flex items-center gap-3 text-slate-800 dark:text-white">
+                  <img src="${p.imagePath || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded bg-slate-200 object-cover border dark:border-slate-600" onerror="this.src='https://via.placeholder.com/40'">
+                  <div>
+                    <div class="font-bold">${p.name}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 max-w-[200px]">${p.description || 'Sem descrição'}</div>
+                  </div>
+              </td>
+              <td class="px-6 py-4 text-slate-500 dark:text-slate-400">${p.categoryName || 'N/A'}</td>
+              <td class="px-6 py-4 text-center">
+                  <span class="px-2 py-1 rounded-full text-xs font-bold ${p.stockQuantity > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-red-100 text-red-700'}">
+                      ${p.stockQuantity} un
+                  </span>
+              </td>
+              <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">R$ ${p.price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td class="px-6 py-4 text-right space-x-2">
+                  <button onclick='editProduct(${JSON.stringify(p)})' class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen"></i></button>
+                  <button onclick="deleteProduct('${p.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+              </td>
+          </tr>
+      `).join('');
+  }
+
+  function updatePagination(data) {
+      document.getElementById('paginationInfo').textContent = `Página ${(data.number || 0) + 1} de ${data.totalPages || 1}`;
+      document.getElementById('prevBtn').disabled = data.first;
+      document.getElementById('nextBtn').disabled = data.last;
+  }
+
+  function changePage(step) {
+      currentPage += step;
+      loadProducts();
+  }
+
+  let timer;
+  function debounceSearch() {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+          searchQuery = document.getElementById('adminSearch').value;
+          currentPage = 0;
+          loadProducts();
+      }, 500);
+  }
+
+  function filterByCategory() {
+      selectedCategoryId = document.getElementById('adminFilterCategory').value;
+      currentPage = 0;
+      loadProducts();
+  }
+
+  // --- CATEGORIAS ---
+  async function loadCategories() {
+      try {
+          const res = await AuthUtils.authenticatedFetch(CAT_URL);
+          const categories = await res.json();
+          document.getElementById('categoryId').innerHTML = '<option value="">Selecione...</option>' +
+              categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+          document.getElementById('adminFilterCategory').innerHTML = '<option value="">Todas Categorias</option>' +
+              categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+          document.getElementById('categoryBadgeList').innerHTML = categories.map(c => `
+              <div class="group flex items-center gap-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-4 py-2 rounded-full shadow-sm hover:border-indigo-500 transition-all">
+                  <span class="text-sm font-bold text-slate-700 dark:text-slate-200">${c.name}</span>
+                  <div class="flex items-center gap-2 border-l pl-2 border-slate-200 dark:border-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onclick='prepareCategoryEdit(${JSON.stringify(c)})' class="text-indigo-500 hover:text-indigo-700"><i class="fa-solid fa-pencil text-xs"></i></button>
+                      <button onclick="deleteCategory('${c.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                  </div>
+              </div>
+          `).join('');
+      } catch (err) { console.error(err); }
+  }
+
+  // --- CRUD OPERAÇÕES ---
+  document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('productId').value;
+      const payload = {
+          name: document.getElementById('name').value,
+          description: document.getElementById('description').value,
+          price: parseFloat(document.getElementById('price').value),
+          stockQuantity: parseInt(document.getElementById('stockQuantity').value),
+          imagePath: document.getElementById('imagePath').value,
+          categoryId: document.getElementById('categoryId').value
+      };
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `${API_URL}/${id}` : API_URL;
+      const res = await AuthUtils.authenticatedFetch(url, {
+          method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+      if (res.ok) { closeModal(); loadProducts(); }
+  });
+
+  function editProduct(p) {
+      document.getElementById('modalTitle').textContent = "Editar Produto";
+      document.getElementById('productId').value = p.id;
+      document.getElementById('name').value = p.name;
+      document.getElementById('description').value = p.description || '';
+      document.getElementById('price').value = p.price;
+      document.getElementById('stockQuantity').value = p.stockQuantity;
+      document.getElementById('imagePath').value = p.imagePath || '';
+      document.getElementById('categoryId').value = p.categoryId || '';
+      document.getElementById('productModal').classList.remove('hidden');
+  }
+
+  async function deleteProduct(id) {
+      if (!confirm("Excluir produto?")) return;
+      const res = await AuthUtils.authenticatedFetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      if (res.ok) loadProducts();
+  }
+
+  // Categoria CRUD
+  document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const res = await AuthUtils.authenticatedFetch(CAT_URL, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: document.getElementById('catName').value })
+      });
+      if (res.ok) { closeCategoryModal(); loadCategories(); }
+  });
+
+  function prepareCategoryEdit(c) {
+      document.getElementById('inlineEditContainer').classList.remove('hidden');
+      document.getElementById('editCatId').value = c.id;
+      document.getElementById('editCatName').value = c.name;
+  }
+  function cancelCategoryEdit() { document.getElementById('inlineEditContainer').classList.add('hidden'); }
+
+  async function saveCategoryEdit() {
+      const id = document.getElementById('editCatId').value;
+      const res = await AuthUtils.authenticatedFetch(`${CAT_URL}/${id}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: document.getElementById('editCatName').value })
+      });
+      if (res.ok) { cancelCategoryEdit(); loadCategories(); loadProducts(); }
+  }
+
+  async function deleteCategory(id) {
+      if (!confirm("Excluir categoria?")) return;
+      const res = await AuthUtils.authenticatedFetch(`${CAT_URL}/${id}`, { method: 'DELETE' });
+      if (res.ok) { loadCategories(); loadProducts(); }
+      else alert("Erro: verifique se há produtos nesta categoria.");
+  }
+
+  // Abre Modais
+  function openModal() { document.getElementById('productId').value = ''; document.getElementById('productForm').reset(); document.getElementById('productModal').classList.remove('hidden'); }
+  function closeModal() { document.getElementById('productModal').classList.add('hidden'); }
+  function openCategoryModal() { document.getElementById('catName').value = ''; document.getElementById('categoryModal').classList.remove('hidden'); }
+  function closeCategoryModal() { document.getElementById('categoryModal').classList.add('hidden'); }
+
+  // Init
+  updateIcons();
+  loadCategories();
+  loadProducts();
+</script>
+</body>
+</html>

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -128,5 +129,14 @@ public class SaleService {
         Page<Sale> salePage = saleRepository.findAllByClientId(clientId, pageable);
 
         return salePage.map(saleMapper::toResponseDto);
+    }
+
+    @Scheduled(cron = "0 30 23 * * ?")
+    @Transactional
+    public void deleteSaleExpired(){
+        saleRepository.deleteExpiredSales(
+                SaleStatus.PENDING,
+                LocalDateTime.now().minusDays(1)
+        );
     }
 }

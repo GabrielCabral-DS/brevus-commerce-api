@@ -13,6 +13,9 @@ public interface SaleItemMapper {
 
     @Mapping(source = "sale.id", target = "saleId")
     @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.name", target = "productName")
+    @Mapping(source = "product.description", target = "description")
+    @Mapping(source = "product.imagePath", target = "productImagePath")
     SaleItemResponseDTO toResponseDto(SaleItem saleItem);
 
     SaleItemRequestDTO toDTO(SaleItem saleItem);

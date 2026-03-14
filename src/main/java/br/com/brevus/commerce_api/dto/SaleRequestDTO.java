@@ -15,7 +15,6 @@ public record SaleRequestDTO(
         @NotNull(message = "Address ID is required.")
         UUID addressId,
 
-        @NotNull(message = "Seller ID is required.")
         UUID sellerId
 ) {
 }

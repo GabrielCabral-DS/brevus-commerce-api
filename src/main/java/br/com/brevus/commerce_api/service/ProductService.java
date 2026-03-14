@@ -50,7 +50,7 @@ public class ProductService {
 
     public List<ProductResponseDTO> lisProductsByDate() {
 
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        PageRequest pageRequest = PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         List<Product> productList = productRepository.findAll(pageRequest).getContent();
 

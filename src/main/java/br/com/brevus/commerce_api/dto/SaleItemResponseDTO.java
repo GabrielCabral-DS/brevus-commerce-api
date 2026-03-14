@@ -7,6 +7,9 @@ public record SaleItemResponseDTO(
         UUID id,
         UUID saleId,
         UUID productId,
+        String productName,
+        String description,
+        String productImagePath,
 
         Integer quantity,
         BigDecimal unitPrice,

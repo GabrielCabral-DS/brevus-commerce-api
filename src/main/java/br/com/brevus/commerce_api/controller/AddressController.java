@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/address")
@@ -32,4 +33,21 @@ public class AddressController {
         return ResponseEntity.ok().body(responseDTOList);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<AddressResponseDTO>> listAddressByUserId(@PathVariable(value = "userId") UUID userId) {
+        List<AddressResponseDTO> responseDTOList = addressService.listAllAddressByUserId(userId);
+        return ResponseEntity.ok().body(responseDTOList);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateAddress(@PathVariable(value = "id") UUID id, @Valid @RequestBody AddressRequestDTO dto) {
+        addressService.updateAddress(id, dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAddressById(@PathVariable(value = "id") UUID id) {
+        addressService.deleteAddressById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

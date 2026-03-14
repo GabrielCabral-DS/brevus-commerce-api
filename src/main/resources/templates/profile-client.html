@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Brevus Commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (typeof AuthUtils !== 'undefined' && !AuthUtils.isAuthenticated()) {
+            window.location.href = '/api/web/login';
+        }
+
+        function updateTheme() {
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        updateTheme();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-300 pb-12">
+
+<nav class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <a href="javascript:history.back()" class="text-slate-500 hover:text-indigo-600 transition-colors">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <span class="text-xl font-bold text-slate-800 dark:text-white ml-2">Configurações de <span class="text-indigo-600">Perfil</span></span>
+        </div>
+        <button id="theme-toggle" class="text-slate-500 dark:text-slate-400 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+    </div>
+</nav>
+
+<main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+
+    <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
+            <div class="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg text-indigo-600">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 dark:text-white">Informações Pessoais</h3>
+        </div>
+        <form id="updateProfileForm" class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Nome Completo</label>
+                    <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Telefone</label>
+                    <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">E-mail</label>
+                    <input type="email" id="email" disabled class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-400 border border-transparent cursor-not-allowed">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Data de Nascimento</label>
+                    <input type="date" id="dateBirth" name="dateBirth" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+            <div class="flex justify-end pt-6 border-t border-slate-100 dark:border-slate-700">
+                <button type="submit" class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg">Salvar Alterações</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg text-emerald-600">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <h3 class="font-bold text-slate-800 dark:text-white">Meus Endereços</h3>
+            </div>
+            <button onclick="openAddressModal()" class="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+                <i class="fa-solid fa-plus mr-1"></i> Adicionar Novo
+            </button>
+        </div>
+        <div id="addressList" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-slate-400 text-sm col-span-full text-center py-4 italic">Buscando endereços...</p>
+        </div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
+            <div class="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg text-amber-600">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="font-bold text-slate-800 dark:text-white">Segurança e Senha</h3>
+        </div>
+        <form id="changePasswordForm" class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Senha Atual</label>
+                    <input type="password" name="currentPassword" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Nova Senha</label>
+                    <input type="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-500">Confirmar Nova Senha</label>
+                    <input type="password" name="passwordConfirmation" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-8 py-3 bg-slate-800 dark:bg-amber-600 text-white font-bold rounded-xl hover:opacity-90">Atualizar Senha</button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<div id="addressModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+            <h3 class="font-black text-xl text-slate-800 dark:text-white">Novo Endereço de Entrega</h3>
+            <button onclick="closeAddressModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form id="addressForm" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2 space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">CEP (Busca Automática)</label>
+                    <input type="text" id="zipCode" name="zipCode" required placeholder="00000-000" maxlength="9" onblur="buscarEnderecoPorCEP(this.value)" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estado (UF)</label>
+                    <input type="text" name="state" required maxlength="2" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white uppercase">
+                </div>
+                <div class="md:col-span-2 space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rua / Logradouro</label>
+                    <input type="text" name="street" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Número</label>
+                    <input type="text" name="number" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bairro</label>
+                    <input type="text" name="neighborhood" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cidade</label>
+                    <input type="text" name="city" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white uppercase">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Complemento</label>
+                    <input type="text" name="complement" placeholder="Apto, Bloco..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-transparent dark:text-white">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="closeAddressModal()" class="px-6 py-3 font-bold text-slate-500">Cancelar</button>
+                <button type="submit" class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg transition-all">Cadastrar Endereço</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const userInfo = AuthUtils.getUserInfo();
+
+    // 1. Inicialização de dados
+    if (userInfo) {
+        document.getElementById('name').value = userInfo.name || '';
+        document.getElementById('email').value = userInfo.email || '';
+        document.getElementById('phone').value = userInfo.phone || '';
+        document.getElementById('dateBirth').value = userInfo.dateBirth || '';
+    }
+
+    // 2. Funções do Modal
+    function openAddressModal() { document.getElementById('addressModal').classList.remove('hidden'); }
+    function closeAddressModal() { document.getElementById('addressModal').classList.add('hidden'); }
+
+    // 3. Busca Automática de CEP (ViaCEP)
+    async function buscarEnderecoPorCEP(cep) {
+        const valor = cep.replace(/\D/g, '');
+        if (valor.length !== 8) return;
+
+        try {
+            const res = await fetch(`https://viacep.com.br/ws/${valor}/json/`);
+            const data = await res.json();
+
+            if (data.erro) {
+                alert("CEP não encontrado.");
+                return;
+            }
+
+            const form = document.getElementById('addressForm');
+            form.querySelector('input[name="street"]').value = data.logradouro;
+            form.querySelector('input[name="neighborhood"]').value = data.bairro;
+            form.querySelector('input[name="city"]').value = data.localidade;
+            form.querySelector('input[name="state"]').value = data.uf;
+            form.querySelector('input[name="number"]').focus();
+        } catch (e) {
+            console.error("Erro na busca de CEP", e);
+        }
+    }
+
+    // 4. Carregar Endereços (Sincronizado com Backend via ID)
+    async function loadAddresses() {
+        const list = document.getElementById('addressList');
+        const userId = userInfo?.id;
+        if (!userId) return;
+
+        try {
+            // CRÍTICO: Use crases para as URLs
+            const res = await fetch(`/api/address/${userId}`, {
+                headers: { 'Authorization': `Bearer ${AuthUtils.getAccessToken()}` }
+            });
+            const addresses = await res.json();
+
+            if (!addresses || addresses.length === 0) {
+                list.innerHTML = `<p class="col-span-full text-center text-slate-400 py-6 italic text-sm">Nenhum endereço cadastrado.</p>`;
+                return;
+            }
+
+            list.innerHTML = addresses.map(addr => `
+                <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 relative group transition-all hover:border-indigo-200">
+                    <p class="text-sm font-bold dark:text-white">${addr.street}, ${addr.number}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">${addr.neighborhood}, ${addr.city.replace('_', ' ')} - ${addr.state}</p>
+                    <p class="text-[10px] text-slate-400 mt-1 font-mono">${addr.zipCode}</p>
+                    <button onclick="deleteAddress('${addr.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = `<p class="text-red-500 text-xs text-center col-span-full">Erro ao carregar endereços.</p>`;
+        }
+    }
+
+    // 5. Submit do Endereço
+    document.getElementById('addressForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        data.userId = userInfo.id;
+
+        try {
+            const res = await fetch('/api/address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AuthUtils.getAccessToken()}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                closeAddressModal();
+                loadAddresses();
+                e.target.reset();
+            }
+        } catch (err) { alert('Erro ao salvar endereço.'); }
+    });
+
+    // 6. Deletar Endereço
+    async function deleteAddress(id) {
+    if (!confirm("Tem certeza que deseja excluir este endereço?")) return;
+
+    try {
+        const res = await fetch(`/api/address/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthUtils.getAccessToken()}`
+            }
+        });
+
+        // Se a resposta for 200-299
+        if (res.ok) {
+            alert("✅ Endereço excluído com sucesso!");
+            loadAddresses();
+            return;
+        }
+
+        // Se chegou aqui, deu erro (ex: 400 Bad Request da BusinessException)
+        const errorData = await res.json();
+
+        // Exibe a mensagem exata que você escreveu no Java:
+        // "Cannot delete address because it is associated with a sale."
+        alert(`⚠️ Atenção: ${errorData.message || 'Erro ao processar solicitação.'}`);
+
+    } catch (e) {
+        console.error("Erro na requisição:", e);
+        alert("🌐 Erro de conexão com o servidor.");
+    }
+}
+
+    // 7. Atualizar Perfil e Senha (IDs dinâmicos)
+    document.getElementById('updateProfileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        try {
+            const res = await fetch(`/api/users/profile/${userInfo.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AuthUtils.getAccessToken()}`
+                },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) alert('✅ Perfil atualizado!');
+        } catch (e) { alert('Erro ao atualizar.'); }
+    });
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        if (data.password !== data.passwordConfirmation) return alert('Senhas não coincidem!');
+        try {
+            const res = await fetch(`/api/users/password/${userInfo.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AuthUtils.getAccessToken()}`
+                },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) { alert('✅ Senha alterada! Faça login novamente.'); AuthUtils.logout(); }
+        } catch (e) { alert('Erro ao trocar senha.'); }
+    });
+
+    // 8. Inicialização Final
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAddresses();
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+    });
+</script>
+</body>
+</html>

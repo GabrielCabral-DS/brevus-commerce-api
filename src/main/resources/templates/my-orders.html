@@ -1,189 +1,413 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" class="light">
 <head>
-  <meta charset="UTF-8">
-  <title>Meus Pedidos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Pedidos | Brevus Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
 
-  <script src="https://cdn.tailwindcss.com"></script>
+        if (!AuthUtils.isAuthenticated() || !AuthUtils.hasRole('CLIENT')) {
+            window.location.href = '/api/web/login';
+        }
 
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased min-h-screen">
 
-<body class="bg-slate-50 dark:bg-slate-900 min-h-screen">
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
 
-<div class="max-w-7xl mx-auto px-6 py-10">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
-  <!-- HEADER -->
-  <div class="flex items-center justify-between mb-8">
+        <!-- ESQUERDA -->
+        <div class="flex items-center gap-4">
 
-    <div>
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white">
-        📦 Meus Pedidos
-      </h1>
+            <!-- BOTÃO VOLTAR -->
+            <button onclick="history.back()"
+                    class="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 transition">
 
-      <p class="text-slate-500 dark:text-slate-400">
-        Acompanhe seus pedidos realizados
-      </p>
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Voltar
+            </button>
+
+            <!-- LOGO -->
+            <span class="text-xl font-bold text-slate-800 dark:text-white">
+                    Brevus <span class="text-indigo-600">Commerce</span>
+                </span>
+
+        </div>
+
+        <!-- CENTRO -->
+        <div class="flex items-center gap-2">
+
+            <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-600"></i>
+
+            <h1 class="font-bold text-sm uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Meus Pedidos
+            </h1>
+
+        </div>
+
+        <!-- DIREITA -->
+        <div class="flex items-center gap-3">
+
+            <!-- DARK MODE -->
+            <button id="theme-toggle"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:ring-2 ring-blue-500 transition-all">
+
+                <i data-lucide="sun"
+                   id="theme-toggle-light-icon"
+                   class="hidden w-5 h-5 text-yellow-500"></i>
+
+                <i data-lucide="moon"
+                   id="theme-toggle-dark-icon"
+                   class="w-5 h-5 text-slate-700 dark:text-blue-400"></i>
+
+            </button>
+
+            <!-- AVATAR -->
+            <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:ring-2 ring-blue-500 transition">
+
+                <i data-lucide="user" class="w-5 h-5"></i>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <a href="/api/web/home-user"
-       class="bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:opacity-80">
-      <i class="fa-solid fa-arrow-left"></i> Voltar
-    </a>
+</header>
 
-  </div>
+<main class="max-w-6xl mx-auto px-4 py-8">
 
-
-  <!-- LISTA DE PEDIDOS -->
-  <div class="space-y-6">
-
-    <!-- CARD PEDIDO -->
-    <div th:each="order : ${orders}"
-         class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
-
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-        <!-- INFO PEDIDO -->
-        <div>
-
-          <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
-            Pedido #<span th:text="${order.id}"></span>
-          </h2>
-
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            Realizado em
-            <span th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></span>
-          </p>
-
+    <!-- Loading State -->
+    <div id="loadingState" class="space-y-6">
+        <div class="animate-pulse space-y-4">
+            <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-3xl"></div>
+            <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-3xl"></div>
+            <div class="h-48 bg-slate-200 dark:bg-slate-800 rounded-3xl"></div>
         </div>
+    </div>
 
-        <!-- STATUS PEDIDO -->
-        <div class="flex flex-wrap gap-3">
-
-          <!-- STATUS -->
-          <span
-                  th:text="${order.status}"
-                  class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-600">
-</span>
-
-          <!-- PAGAMENTO -->
-          <span
-                  th:text="${order.paymentStatus}"
-                  class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-600">
-</span>
-
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-20">
+        <div class="bg-slate-100 dark:bg-slate-900 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8">
+            <i data-lucide="package-open" class="w-12 h-12 text-slate-400"></i>
         </div>
-
-
-        <!-- TOTAL -->
-        <div class="text-lg font-bold text-slate-700 dark:text-white">
-
-          R$ <span th:text="${order.total}"></span>
-
-        </div>
-
-      </div>
-
-
-      <!-- PRODUTOS DO PEDIDO -->
-      <div class="mt-6 border-t pt-4">
-
-        <h3 class="font-semibold text-slate-700 dark:text-slate-300 mb-3">
-          Produtos
-        </h3>
-
-        <div class="space-y-2">
-
-          <div
-                  th:each="item : ${order.items}"
-                  class="flex justify-between text-sm">
-
-            <div>
-
-              <span th:text="${item.productName}"></span>
-              <span class="text-slate-400">
-x<span th:text="${item.quantity}"></span>
-</span>
-
-            </div>
-
-            <div>
-
-              R$ <span th:text="${item.price}"></span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- RASTREAMENTO -->
-      <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-        <div class="text-sm text-slate-600 dark:text-slate-400">
-
-          🚚 Rastreamento:
-
-          <span th:if="${order.trackingCode != null}"
-                class="font-medium"
-                th:text="${order.trackingCode}">
-    </span>
-
-          <span th:if="${order.trackingCode == null}">
-         Aguardando envio
-     </span>
-
-        </div>
-
-        <!-- DETALHES -->
-        <a
-                th:href="@{/api/web/orders/{id}(id=${order.id})}"
-                class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90">
-
-          Ver detalhes
-
+        <h2 class="text-2xl font-bold mb-4 dark:text-white">Nenhum pedido encontrado</h2>
+        <p class="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Você ainda não realizou nenhuma compra conosco. Que tal explorar nossos produtos?</p>
+        <a href="/api/web/products-client" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/30">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            Ir para a Loja
         </a>
-
-      </div>
-
     </div>
 
-  </div>
-
-
-  <!-- SEM PEDIDOS -->
-  <div
-          th:if="${orders.isEmpty()}"
-          class="text-center py-20">
-
-    <div class="text-6xl mb-4">
-      📦
+    <!-- Error State -->
+    <div id="errorState" class="hidden text-center py-20">
+        <div class="bg-red-100 dark:bg-red-900/20 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8">
+            <i data-lucide="alert-circle" class="w-12 h-12 text-red-500"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-4 text-red-600 dark:text-red-400">Erro ao carregar pedidos</h2>
+        <p class="text-slate-500 dark:text-slate-400 mb-8">Não foi possível carregar seus pedidos. Tente novamente.</p>
+        <button onclick="loadOrders()" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-bold transition-all">
+            <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
+            Tentar Novamente
+        </button>
     </div>
 
-    <h2 class="text-xl font-semibold text-slate-700 dark:text-white">
-      Você ainda não fez pedidos
-    </h2>
+    <!-- Orders List -->
+    <div id="ordersList" class="hidden space-y-6">
+        <!-- Orders will be rendered here -->
+    </div>
 
-    <p class="text-slate-500 mt-2">
-      Explore nossos produtos e faça sua primeira compra
-    </p>
+    <!-- Pagination -->
+    <div id="pagination" class="hidden flex justify-center items-center gap-4 mt-12">
+        <button id="prevPage" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            Anterior
+        </button>
+        <span id="pageInfo" class="text-sm text-slate-600 dark:text-slate-400">Página 1</span>
+        <button id="nextPage" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            Próxima
+        </button>
+    </div>
+</main>
 
-    <a href="/api/web/products-client"
-       class="mt-6 inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg">
+<script>
+    // Theme toggle functionality
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
 
-      Ver produtos
+    function updateThemeIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        lightIcon.classList.toggle('hidden', !isDark);
+        darkIcon.classList.toggle('hidden', isDark);
+    }
 
-    </a>
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        updateThemeIcons();
+    });
+    updateThemeIcons();
 
-  </div>
+    let currentPage = 1;
+    const itemsPerPage = 3;
 
+    async function loadOrders(page = 1) {
+        const userInfo = AuthUtils.getUserInfo();
+        if (!userInfo || !userInfo.id) {
+            showErrorState();
+            return;
+        }
 
-</div>
+        const clientId = userInfo.id;
 
+        // Show loading state
+        showLoadingState();
+
+        try {
+            const response = await AuthUtils.authenticatedFetch(`/api/sales/${clientId}?page=${page}&size=${itemsPerPage}`);
+
+            if (response.status === 401) {
+                AuthUtils.logout();
+                window.location.href = '/api/web/login';
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            const data = await response.json();
+            renderOrders(data.orders);
+            updatePaginationControls(page, data.totalPages);
+        } catch (error) {
+            console.error('Erro ao carregar pedidos:', error);
+            showErrorState();
+        }
+    }
+
+    function showLoadingState() {
+        document.getElementById('loadingState').classList.remove('hidden');
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('errorState').classList.add('hidden');
+        document.getElementById('ordersList').classList.add('hidden');
+    }
+
+    function showErrorState() {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('errorState').classList.remove('hidden');
+        document.getElementById('ordersList').classList.add('hidden');
+    }
+
+    function renderOrders(orders) {
+        const list = document.getElementById('ordersList');
+        const empty = document.getElementById('emptyState');
+        const loading = document.getElementById('loadingState');
+        const error = document.getElementById('errorState');
+
+        // Hide loading and error states
+        loading.classList.add('hidden');
+        error.classList.add('hidden');
+
+        if (!orders || orders.length === 0) {
+            list.classList.add('hidden');
+            empty.classList.remove('hidden');
+            return;
+        }
+
+        // Show orders list
+        list.classList.remove('hidden');
+        empty.classList.add('hidden');
+
+        list.innerHTML = orders.map(order => `
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-800">
+                <!-- Order Header -->
+                <div class="p-6 border-b border-slate-50 dark:border-slate-800">
+                    <div class="flex flex-wrap justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-2xl">
+                                <i data-lucide="package" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pedido</span>
+                                    <span class="font-mono text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">#${order.id.substring(0, 8)}...</span>
+                                </div>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">
+                                    ${new Date(order.saleDate).toLocaleDateString('pt-BR', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-blue-600 dark:text-blue-400 mb-1">
+                                R$ ${order.totalAmount.toFixed(2).replace('.', ',')}
+                            </div>
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold
+                                ${order.status === 'PAID' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                                  order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                  'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">
+                                <div class="w-2 h-2 rounded-full ${order.status === 'PAID' ? 'bg-blue-500' : order.status === 'PENDING' ? 'bg-yellow-500' : 'bg-slate-500'}"></div>
+                                ${order.status === 'PAID' ? 'Pago' : order.status === 'PENDING' ? 'Pendente' : 'Processando'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Progress -->
+                <div class="p-6 bg-slate-50/50 dark:bg-slate-800/20">
+                    <div class="flex justify-between items-center relative mb-4">
+                        <div class="absolute top-6 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -z-0 rounded-full"></div>
+                        <div class="absolute top-6 left-0 w-full h-1 bg-blue-500 -z-0 rounded-full transition-all duration-500"
+                             style="width: ${getProgressWidth(order.deliveryStatus)}%"></div>
+
+                        <div class="relative z-10 flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full ${order.status === 'PAID' ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
+                                <i data-lucide="check" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase text-center">Pago</span>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full ${['PREPARANDO_PEDIDO', 'ENVIADO', 'ENTREGUE'].includes(order.deliveryStatus) ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
+                                <i data-lucide="package" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase text-center">Preparando</span>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full ${['ENVIADO', 'ENTREGUE'].includes(order.deliveryStatus) ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
+                                <i data-lucide="truck" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase text-center">Enviado</span>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full ${order.deliveryStatus === 'ENTREGUE' ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
+                                <i data-lucide="home" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase text-center">Entregue</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-sm font-medium text-slate-600 dark:text-slate-400">
+                            Status: <span class="font-bold capitalize">${getDeliveryStatusText(order.deliveryStatus)}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="p-6">
+                    <h4 class="font-bold mb-4 flex items-center gap-2">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        Itens do Pedido
+                    </h4>
+                    <div class="space-y-3">
+                        ${order.items.map(item => `
+                            <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <img src="${item.productImageUrl || item.productImagePath || 'https://via.placeholder.com/40'}"
+                                         alt="${item.productName || 'Produto'}"
+                                         class="w-10 h-10 object-cover rounded-lg bg-slate-200 dark:bg-slate-700">
+                                    <div>
+                                        <p class="font-medium text-sm dark:text-white">${item.productName || 'Produto #' + item.productId.substring(0, 8) + '...'}</p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">R$ ${item.unitPrice.toFixed(2).replace('.', ',')} cada</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-slate-900 dark:text-white">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        lucide.createIcons();
+    }
+
+    function updatePaginationControls(currentPage, totalPages) {
+        const pagination = document.getElementById('pagination');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        pageInfo.innerText = `Página ${currentPage}`;
+
+        prevPageBtn.classList.toggle('disabled', currentPage === 1);
+        nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
+
+        pagination.classList.remove('hidden');
+    }
+
+    function getProgressWidth(status) {
+        switch (status) {
+            case 'AGUARDANDO_PROCESSAMENTO': return 0;
+            case 'PREPARANDO_PEDIDO': return 25;
+            case 'ENVIADO': return 75;
+            case 'ENTREGUE': return 100;
+            default: return 0;
+        }
+    }
+
+    function getDeliveryStatusText(status) {
+        switch (status) {
+            case 'AGUARDANDO_PROCESSAMENTO': return 'Aguardando Processamento';
+            case 'PREPARANDO_PEDIDO': return 'Preparando Pedido';
+            case 'ENVIADO': return 'Enviado';
+            case 'ENTREGUE': return 'Entregue';
+            default: return status;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => loadOrders());
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadOrders(currentPage);
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        currentPage++;
+        loadOrders(currentPage);
+    });
+</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -24,5 +25,16 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponseDTO>> listAllPayments(){
         List<PaymentResponseDTO> responseDTOList = paymentService.listAllPayments();
         return ResponseEntity.ok().body(responseDTOList);
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<PaymentResponseDTO>> listLast10Payments(){
+        List<PaymentResponseDTO> responseDTOList = paymentService.getRecentPaidPayments();
+        return ResponseEntity.ok().body(responseDTOList);
+    }
+
+    @GetMapping("/revenue/month")
+    public ResponseEntity<BigDecimal> getMonthlyRevenue() {
+        return ResponseEntity.ok(paymentService.getMonthlyRevenue());
     }
 }

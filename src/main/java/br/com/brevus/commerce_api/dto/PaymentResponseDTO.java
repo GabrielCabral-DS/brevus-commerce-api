@@ -11,6 +11,8 @@ public record PaymentResponseDTO(
 
         UUID id,
         UUID saleId,
+        String clientName,
+        String clientEmail,
 
         PaymentMethod method,
         PaymentStatus status,

@@ -12,6 +12,8 @@ import java.util.List;
 public interface PaymentMapper {
 
     @Mapping(source = "sale.id", target = "saleId")
+    @Mapping(source = "sale.client.name", target = "clientName")
+    @Mapping(source = "sale.client.email", target = "clientEmail")
     PaymentResponseDTO toResponseDTO(Payment payment);
 
     @Mapping(source = "sale.id", target = "saleId")

@@ -14,6 +14,7 @@ import br.com.brevus.commerce_api.repository.SaleRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -62,6 +63,30 @@ public class PaymentService {
     public List<PaymentResponseDTO> listAllPayments(){
         List<Payment> paymentList = paymentRepository.findAll();
         return paymentMapper.toDtoList(paymentList);
+    }
+
+    public List<PaymentResponseDTO> getRecentPaidPayments(){
+        List<Payment> paymentList = paymentRepository.findTop10ByStatusOrderByCreatedAtDesc(PaymentStatus.PAID);
+        return paymentMapper.toDtoList(paymentList);
+    }
+
+    public BigDecimal getMonthlyRevenue() {
+
+        LocalDate now = LocalDate.now();
+
+        LocalDateTime startOfMonth = now
+                .withDayOfMonth(1)
+                .atStartOfDay();
+
+        LocalDateTime endOfMonth = now
+                .withDayOfMonth(now.lengthOfMonth())
+                .atTime(23, 59, 59);
+
+        return paymentRepository.sumPaymentsByStatusAndPeriod(
+                PaymentStatus.PAID,
+                startOfMonth,
+                endOfMonth
+        );
     }
 
 }

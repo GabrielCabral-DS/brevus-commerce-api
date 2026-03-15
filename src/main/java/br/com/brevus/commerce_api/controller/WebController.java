@@ -98,4 +98,9 @@ public class WebController {
     public String pixPage() {
         return "pix";
     }
+
+    @GetMapping("/api/web/sales")
+    public String salesPage() {
+        return "sales";
+    }
 }

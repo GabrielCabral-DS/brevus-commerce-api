@@ -57,6 +57,16 @@
         <!-- DIREITA -->
         <div class="flex items-center gap-3">
 
+            <!-- REFRESH -->
+            <button id="refresh-btn"
+                    onclick="loadOrders(currentPage)"
+                    class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:ring-2 ring-blue-500 transition-all"
+                    title="Atualizar pedidos">
+
+                <i data-lucide="refresh-ccw" class="w-5 h-5 text-slate-700 dark:text-slate-300"></i>
+
+            </button>
+
             <!-- DARK MODE -->
             <button id="theme-toggle"
                     class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:ring-2 ring-blue-500 transition-all">
@@ -159,11 +169,16 @@
 
     let currentPage = 1;
     const itemsPerPage = 3;
+    let isLoading = false;
 
     async function loadOrders(page = 1) {
+        if (isLoading) return; // Prevent multiple simultaneous loads
+        isLoading = true;
+
         const userInfo = AuthUtils.getUserInfo();
         if (!userInfo || !userInfo.id) {
             showErrorState();
+            isLoading = false;
             return;
         }
 
@@ -191,6 +206,8 @@
         } catch (error) {
             console.error('Erro ao carregar pedidos:', error);
             showErrorState();
+        } finally {
+            isLoading = false;
         }
     }
 
@@ -390,24 +407,14 @@
         currentPage++;
         loadOrders(currentPage);
     });
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        if (!isLoading) {
+            loadOrders(currentPage);
+        }
+    }, 30000);
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -149,7 +149,7 @@
 </main>
 
 <script>
-    // Theme toggle functionality
+    // Gerenciamento de Tema (Dark/Light Mode)
     const themeToggleBtn = document.getElementById('theme-toggle');
     const darkIcon = document.getElementById('theme-toggle-dark-icon');
     const lightIcon = document.getElementById('theme-toggle-light-icon');
@@ -167,12 +167,14 @@
     });
     updateThemeIcons();
 
+    // Estado Global da Aplicação
     let currentPage = 1;
     const itemsPerPage = 3;
     let isLoading = false;
 
+    // Função Principal de Carga de Dados
     async function loadOrders(page = 1) {
-        if (isLoading) return; // Prevent multiple simultaneous loads
+        if (isLoading) return;
         isLoading = true;
 
         const userInfo = AuthUtils.getUserInfo();
@@ -182,13 +184,11 @@
             return;
         }
 
-        const clientId = userInfo.id;
-
-        // Show loading state
         showLoadingState();
 
         try {
-            const response = await AuthUtils.authenticatedFetch(`/api/sales/${clientId}?page=${page}&size=${itemsPerPage}`);
+            // Chamada para API (Ajuste de página para 0-based se necessário no back)
+            const response = await AuthUtils.authenticatedFetch(`/api/sales/${userInfo.id}?page=${page}&size=${itemsPerPage}`);
 
             if (response.status === 401) {
                 AuthUtils.logout();
@@ -196,11 +196,13 @@
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
             const data = await response.json();
+
+            // ATUALIZAÇÃO DO ESTADO GLOBAL (Essencial para a paginação funcionar)
+            currentPage = page;
+
             renderOrders(data.orders);
             updatePaginationControls(page, data.totalPages);
         } catch (error) {
@@ -211,6 +213,7 @@
         }
     }
 
+    // Gerenciamento de Interface (States)
     function showLoadingState() {
         document.getElementById('loadingState').classList.remove('hidden');
         document.getElementById('emptyState').classList.add('hidden');
@@ -220,20 +223,15 @@
 
     function showErrorState() {
         document.getElementById('loadingState').classList.add('hidden');
-        document.getElementById('emptyState').classList.add('hidden');
         document.getElementById('errorState').classList.remove('hidden');
-        document.getElementById('ordersList').classList.add('hidden');
     }
 
+    // Renderização da Lista de Pedidos
     function renderOrders(orders) {
         const list = document.getElementById('ordersList');
         const empty = document.getElementById('emptyState');
-        const loading = document.getElementById('loadingState');
-        const error = document.getElementById('errorState');
 
-        // Hide loading and error states
-        loading.classList.add('hidden');
-        error.classList.add('hidden');
+        document.getElementById('loadingState').classList.add('hidden');
 
         if (!orders || orders.length === 0) {
             list.classList.add('hidden');
@@ -241,179 +239,114 @@
             return;
         }
 
-        // Show orders list
         list.classList.remove('hidden');
         empty.classList.add('hidden');
 
-        list.innerHTML = orders.map(order => `
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-800">
-                <!-- Order Header -->
-                <div class="p-6 border-b border-slate-50 dark:border-slate-800">
-                    <div class="flex flex-wrap justify-between items-center gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-2xl">
-                                <i data-lucide="package" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pedido</span>
-                                    <span class="font-mono text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">#${order.id.substring(0, 8)}...</span>
+        list.innerHTML = orders.map(order => {
+            const hasPayment = order.payment !== null;
+            const isPaid = order.status === 'PAID';
+
+            return `
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all hover:shadow-lg">
+                    <div class="p-6 border-b border-slate-50 dark:border-slate-800">
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-2xl">
+                                    <i data-lucide="package" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
                                 </div>
-                                <p class="text-sm text-slate-500 dark:text-slate-400">
-                                    ${new Date(order.saleDate).toLocaleDateString('pt-BR', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}
-                                </p>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Pedido</span>
+                                        <span class="font-mono text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">#${order.id.substring(0, 8)}</span>
+                                    </div>
+                                    <p class="text-sm text-slate-500">${new Date(order.saleDate).toLocaleDateString('pt-BR')}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black text-slate-800 dark:text-white">
+                                    R$ ${order.totalAmount.toFixed(2).replace('.', ',')}
+                                </div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mt-1
+                                    ${isPaid ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'}">
+                                    <div class="w-2 h-2 rounded-full ${isPaid ? 'bg-green-500' : 'bg-amber-500'}"></div>
+                                    ${isPaid ? 'Pago via ' + (order.payment?.method || 'PIX') : 'Aguardando Pagamento'}
+                                </div>
                             </div>
                         </div>
-
-                        <div class="text-right">
-                            <div class="text-2xl font-black text-blue-600 dark:text-blue-400 mb-1">
-                                R$ ${order.totalAmount.toFixed(2).replace('.', ',')}
+                        ${!hasPayment && order.status === 'PENDING' ? `
+                            <div class="mt-4 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 rounded-2xl flex justify-between items-center">
+                                <p class="text-xs font-medium text-amber-800 dark:text-amber-400">Pagamento não identificado.</p>
                             </div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold
-                                ${order.status === 'PAID' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                                  order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                                  'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">
-                                <div class="w-2 h-2 rounded-full ${order.status === 'PAID' ? 'bg-blue-500' : order.status === 'PENDING' ? 'bg-yellow-500' : 'bg-slate-500'}"></div>
-                                ${order.status === 'PAID' ? 'Pago' : order.status === 'PENDING' ? 'Pendente' : 'Processando'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Progress -->
-                <div class="p-6 bg-slate-50/50 dark:bg-slate-800/20">
-                    <div class="flex justify-between items-center relative mb-4">
-                        <div class="absolute top-6 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -z-0 rounded-full"></div>
-                        <div class="absolute top-6 left-0 w-full h-1 bg-blue-500 -z-0 rounded-full transition-all duration-500"
-                             style="width: ${getProgressWidth(order.deliveryStatus)}%"></div>
-
-                        <div class="relative z-10 flex flex-col items-center gap-2">
-                            <div class="w-10 h-10 rounded-full ${order.status === 'PAID' ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
-                                <i data-lucide="check" class="w-5 h-5"></i>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase text-center">Pago</span>
-                        </div>
-
-                        <div class="relative z-10 flex flex-col items-center gap-2">
-                            <div class="w-10 h-10 rounded-full ${['PREPARANDO_PEDIDO', 'ENVIADO', 'ENTREGUE'].includes(order.deliveryStatus) ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
-                                <i data-lucide="package" class="w-5 h-5"></i>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase text-center">Preparando</span>
-                        </div>
-
-                        <div class="relative z-10 flex flex-col items-center gap-2">
-                            <div class="w-10 h-10 rounded-full ${['ENVIADO', 'ENTREGUE'].includes(order.deliveryStatus) ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
-                                <i data-lucide="truck" class="w-5 h-5"></i>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase text-center">Enviado</span>
-                        </div>
-
-                        <div class="relative z-10 flex flex-col items-center gap-2">
-                            <div class="w-10 h-10 rounded-full ${order.deliveryStatus === 'ENTREGUE' ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'} flex items-center justify-center text-white shadow-lg transition-all">
-                                <i data-lucide="home" class="w-5 h-5"></i>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase text-center">Entregue</span>
-                        </div>
+                        ` : ''}
                     </div>
 
-                    <div class="text-center">
-                        <p class="text-sm font-medium text-slate-600 dark:text-slate-400">
-                            Status: <span class="font-bold capitalize">${getDeliveryStatusText(order.deliveryStatus)}</span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Order Items -->
-                <div class="p-6">
-                    <h4 class="font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                        Itens do Pedido
-                    </h4>
-                    <div class="space-y-3">
-                        ${order.items.map(item => `
-                            <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                                <div class="flex items-center gap-3">
-                                    <img src="${item.productImageUrl || item.productImagePath || 'https://via.placeholder.com/40'}"
-                                         alt="${item.productName || 'Produto'}"
-                                         class="w-10 h-10 object-cover rounded-lg bg-slate-200 dark:bg-slate-700">
-                                    <div>
-                                        <p class="font-medium text-sm dark:text-white">${item.productName || 'Produto #' + item.productId.substring(0, 8) + '...'}</p>
-                                        <p class="text-xs text-slate-500 dark:text-slate-400">R$ ${item.unitPrice.toFixed(2).replace('.', ',')} cada</p>
+                    <div class="p-6 bg-slate-50/50 dark:bg-slate-800/20 border-b border-slate-50 dark:border-slate-800">
+                        <div class="flex justify-between items-center relative mb-4">
+                            <div class="absolute top-5 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -z-0"></div>
+                            <div class="absolute top-5 left-0 h-1 bg-blue-500 transition-all duration-700" style="width: ${getProgressWidth(order.deliveryStatus, isPaid)}%"></div>
+                            ${['check', 'package', 'truck', 'home'].map((icon, index) => `
+                                <div class="relative z-10 flex flex-col items-center gap-2">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-500 ${getStepActive(index, order.deliveryStatus, isPaid) ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'}">
+                                        <i data-lucide="${icon}" class="w-5 h-5"></i>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-slate-900 dark:text-white">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</p>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            ${order.items.map(item => `
+                                <div class="flex items-center gap-4">
+                                    <img src="${item.productImagePath}" class="w-14 h-14 object-cover rounded-2xl border border-slate-100 dark:border-slate-800" onerror="this.src='https://via.placeholder.com/60'">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold dark:text-white">${item.productName}</h4>
+                                        <p class="text-xs text-slate-500">${item.quantity} un • R$ ${item.unitPrice.toFixed(2).replace('.', ',')}</p>
+                                    </div>
+                                    <p class="font-bold text-sm text-slate-900 dark:text-white">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</p>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         lucide.createIcons();
     }
 
-    function updatePaginationControls(currentPage, totalPages) {
+    // Helpers de Paginação e Status
+    function updatePaginationControls(page, total) {
         const pagination = document.getElementById('pagination');
-        const prevPageBtn = document.getElementById('prevPage');
-        const nextPageBtn = document.getElementById('nextPage');
-        const pageInfo = document.getElementById('pageInfo');
-
-        pageInfo.innerText = `Página ${currentPage}`;
-
-        prevPageBtn.classList.toggle('disabled', currentPage === 1);
-        nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
-
-        pagination.classList.remove('hidden');
+        document.getElementById('pageInfo').innerText = `Página ${page} de ${total}`;
+        document.getElementById('prevPage').disabled = (page <= 1);
+        document.getElementById('nextPage').disabled = (page >= total);
+        pagination.classList.toggle('hidden', total <= 1);
     }
 
-    function getProgressWidth(status) {
-        switch (status) {
-            case 'AGUARDANDO_PROCESSAMENTO': return 0;
-            case 'PREPARANDO_PEDIDO': return 25;
-            case 'ENVIADO': return 75;
-            case 'ENTREGUE': return 100;
-            default: return 0;
-        }
+    function getProgressWidth(status, isPaid) {
+        if (!isPaid) return 0;
+        const widths = { 'PREPARANDO_PEDIDO': 33, 'ENVIADO': 66, 'ENTREGUE': 100 };
+        return widths[status] || 0;
     }
 
-    function getDeliveryStatusText(status) {
-        switch (status) {
-            case 'AGUARDANDO_PROCESSAMENTO': return 'Aguardando Processamento';
-            case 'PREPARANDO_PEDIDO': return 'Preparando Pedido';
-            case 'ENVIADO': return 'Enviado';
-            case 'ENTREGUE': return 'Entregue';
-            default: return status;
-        }
+    function getStepActive(stepIndex, status, isPaid) {
+        if (stepIndex === 0) return isPaid;
+        if (!isPaid) return false;
+        const statusMap = { 'PREPARANDO_PEDIDO': 1, 'ENVIADO': 2, 'ENTREGUE': 3 };
+        return statusMap[status] >= stepIndex;
     }
 
-    document.addEventListener('DOMContentLoaded', () => loadOrders());
+    // Event Listeners de Inicialização e Navegação
+    document.addEventListener('DOMContentLoaded', () => loadOrders(1));
 
     document.getElementById('prevPage').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            loadOrders(currentPage);
-        }
+        if (currentPage > 1) loadOrders(currentPage - 1);
     });
 
     document.getElementById('nextPage').addEventListener('click', () => {
-        currentPage++;
-        loadOrders(currentPage);
+        loadOrders(currentPage + 1);
     });
-
-    // Auto-refresh every 30 seconds
-    setInterval(() => {
-        if (!isLoading) {
-            loadOrders(currentPage);
-        }
-    }, 30000);
 </script>
 </body>
 </html>

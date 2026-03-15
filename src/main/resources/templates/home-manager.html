@@ -36,8 +36,8 @@
             <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
         </a>
 
-        <a href="#" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-            <i class="fa-solid fa-cart-shopping w-5 text-center group-hover:text-indigo-600"></i> Vendas
+        <a href="/api/web/sales" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+            <i class="fa-solid fa-dollar-sign w-5 text-center group-hover:text-indigo-600"></i> Faturamento
         </a>
 
         <a href="/api/web/products" class="group flex items-center gap-3 p-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
@@ -112,12 +112,14 @@
 
     <div class="p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 rounded-xl">
+                    <div class="p-3 bg-green-100 dark:bg-green-900/50 text-green-600 rounded-xl">
                         <i class="fa-solid fa-money-bill-trend-up text-xl"></i>
                     </div>
-                    <span class="text-xs font-bold text-green-500 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded">+12%</span>
+                    <span class="flex h-2 w-2 rounded-full bg-green-500 animate-ping"></span>
                 </div>
                 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Faturamento Total</p>
                 <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1">R$ <span th:text="${totalFaturamento}">45.230,00</span></h3>
@@ -145,14 +147,15 @@
 
             <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-green-100 dark:bg-green-900/50 text-green-600 rounded-xl">
-                        <i class="fa-solid fa-building-columns text-xl"></i>
+                    <div class="p-3 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 rounded-xl">
+                        <i class="fa-solid fa-money-bill-trend-up text-xl"></i>
                     </div>
-                    <span class="flex h-2 w-2 rounded-full bg-green-500 animate-ping"></span>
                 </div>
-                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Gateway Efí Bank</p>
-                <h3 class="text-lg font-bold text-slate-800 dark:text-white mt-1">Conectado</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Clientes</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1" th:text="${vendasPendentes}">18</h3>
             </div>
+
+
         </div>
 
         <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
@@ -168,38 +171,11 @@
                         <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Valor</th>
                         <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">TXID (Efí)</th>
                         <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                        <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Tipo</th>
                         <th class="p-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Ações</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-                    <tr th:each="venda : ${vendas}" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                        <td class="p-4">
-                            <p class="font-bold text-slate-800 dark:text-white text-sm">João Silva</p>
-                            <p class="text-xs text-slate-500">joao@email.com</p>
-                        </td>
-                        <td class="p-4 font-medium text-slate-700 dark:text-slate-300 text-sm">R$ 599,00</td>
-                        <td class="p-4 text-xs font-mono text-slate-500 dark:text-slate-400">79af8c...221</td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">PAGO</span>
-                        </td>
-                        <td class="p-4">
-                            <button class="text-slate-400 hover:text-indigo-600"><i class="fa-solid fa-eye"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="p-4">
-                            <p class="font-bold text-slate-800 dark:text-white text-sm">Maria Souza</p>
-                            <p class="text-xs text-slate-500">maria@email.com</p>
-                        </td>
-                        <td class="p-4 font-medium text-slate-700 dark:text-slate-300 text-sm">R$ 1.250,00</td>
-                        <td class="p-4 text-xs font-mono text-slate-500 dark:text-slate-400">44bc12...90a</td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 uppercase leading-none">Aguardando PIX</span>
-                        </td>
-                        <td class="p-4">
-                            <button class="text-slate-400 hover:text-indigo-600"><i class="fa-solid fa-eye"></i></button>
-                        </td>
-                    </tr>
+                    <tbody id="sales-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
                     </tbody>
                 </table>
             </div>
@@ -231,6 +207,64 @@
             localStorage.setItem('color-theme', 'dark');
         }
     });
+
+    async function loadRecentSales() {
+        try {
+            const response = await AuthUtils.authenticatedFetch('/api/payments/recent');
+            const sales = await response.json();
+            const tbody = document.getElementById('sales-tbody');
+            tbody.innerHTML = '';
+            sales.forEach(sale => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors';
+                const statusClass = getStatusClass(sale.status);
+                const statusText = getStatusText(sale.status);
+                const methodText = sale.method === 'PIX' ? 'PIX' : 'CARTÃO';
+                const txid = sale.gatewayTransactionId ? sale.gatewayTransactionId.substring(0,6) + '...' + sale.gatewayTransactionId.slice(-3) : '';
+                const amount = 'R$ ' + parseFloat(sale.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                row.innerHTML = `
+                    <td class="p-4">
+                        <p class="font-bold text-slate-800 dark:text-white text-sm">${sale.clientName}</p>
+                        <p class="text-xs text-slate-500">${sale.clientEmail}</p>
+                    </td>
+                    <td class="p-4 font-medium text-slate-700 dark:text-slate-300 text-sm">${amount}</td>
+                    <td class="p-4 text-xs font-mono text-slate-500 dark:text-slate-400">${txid}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold ${statusClass}">${statusText}</span>
+                    </td>
+                    <td class="p-4 text-sm font-medium text-slate-700 dark:text-slate-300">${methodText}</td>
+                    <td class="p-4">
+                        <button class="text-slate-400 hover:text-indigo-600"><i class="fa-solid fa-eye"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar vendas recentes:', error);
+        }
+    }
+
+    function getStatusText(status) {
+        switch(status) {
+            case 'PAID': return 'PAGO';
+            case 'WAITING': return 'AGUARDANDO';
+            case 'CREATED': return 'CRIADO';
+            case 'FAILED': return 'FALHADO';
+            default: return status;
+        }
+    }
+
+    function getStatusClass(status) {
+        switch(status) {
+            case 'PAID': return 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300';
+            case 'WAITING': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+            case 'CREATED': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
+            case 'FAILED': return 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300';
+            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRecentSales);
 </script>
 </body>
 </html>

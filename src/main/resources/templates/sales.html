@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BI Financeiro | Brevus Commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        // Persistência de tema ao carregar
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col transition-colors duration-300">
+
+<nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+        <div class="bg-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none">
+            <i class="fa-solid fa-rocket text-white"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-black text-slate-800 dark:text-white leading-tight">Brevus <span class="text-indigo-600">Commerce</span></h1>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Financial Intelligence</p>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+        <a href="/api/web/home" class="flex items-center gap-2 px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all text-sm font-bold">
+            <i class="fa-solid fa-house"></i>
+            <span class="hidden md:block">Home-Manager</span>
+        </a>
+
+        <div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2"></div>
+
+        <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
+            <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+
+        <div class="relative ml-2">
+            <div id="adminMenuTrigger" class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black cursor-pointer hover:scale-105 transition-transform border-2 border-white dark:border-slate-700 shadow-sm">
+                <span id="adminInitial">A</span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-1 overflow-y-auto custom-scrollbar">
+
+    <header class="p-8 pb-0">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h2 class="text-3xl font-black text-slate-800 dark:text-white">Controle de Faturamento</h2>
+                <p class="text-slate-500 font-medium">Análise de desempenho por período</p>
+            </div>
+
+            <div class="flex bg-white dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <button class="period-btn px-6 py-2 text-xs font-black rounded-xl bg-indigo-600 text-white shadow-md transition-all" data-period="day">DIA</button>
+                <button class="period-btn px-6 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-all" data-period="week">SEMANA</button>
+                <button class="period-btn px-6 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-all" data-period="month">MÊS</button>
+                <button class="period-btn px-6 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-all" data-period="year">ANO</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="p-8 space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="absolute right-0 top-0 p-4 opacity-10 text-indigo-600"><i class="fa-solid fa-coins text-6xl"></i></div>
+                <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Faturamento Bruto</p>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white mt-2">R$ 145.230,00</h3>
+                <p class="text-xs text-green-500 font-bold mt-2"><i class="fa-solid fa-caret-up"></i> 12% vs período anterior</p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Ticket Médio</p>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white mt-2">R$ 485,20</h3>
+                <p class="text-xs text-slate-400 font-medium mt-2">Baseado em 298 vendas</p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm border-b-4 border-b-indigo-500">
+                <p class="text-slate-500 text-xs font-black uppercase tracking-widest">Taxa de Conversão</p>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white mt-2">18.4%</h3>
+                <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-4">
+                    <div class="bg-indigo-600 h-1.5 rounded-full" style="width: 18%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <h3 class="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-indigo-600"></i> Evolução das Vendas
+                </h3>
+                <canvas id="salesChart" height="140"></canvas>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <h3 class="font-bold text-slate-800 dark:text-white mb-6">Mais Vendidos</h3>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center font-bold text-xs">1º</div>
+                            <span class="text-sm font-bold dark:text-slate-300">iPhone 15 Pro</span>
+                        </div>
+                        <span class="text-xs font-black dark:text-white">84 un</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center font-bold text-xs">2º</div>
+                            <span class="text-sm font-bold dark:text-slate-300">AirPods Max</span>
+                        </div>
+                        <span class="text-xs font-black dark:text-white">52 un</span>
+                    </div>
+                </div>
+                <button class="w-full mt-8 py-3 text-xs font-bold text-indigo-600 border border-indigo-100 dark:border-slate-700 rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 transition-all uppercase tracking-widest">Ver Relatório Completo</button>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-50 dark:border-slate-700">
+                <h3 class="font-bold text-slate-800 dark:text-white italic">Top Clientes (Maiores Investidores)</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                    <tr class="bg-slate-50 dark:bg-slate-700/50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <th class="p-6">Cliente</th>
+                        <th class="p-6 text-center">Frequência</th>
+                        <th class="p-6">Última Compra</th>
+                        <th class="p-6 text-right">Total Acumulado</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50 dark:divide-slate-700">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                        <td class="p-6 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-md shadow-indigo-200">RC</div>
+                            <div>
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">Ricardo Castro</p>
+                                <p class="text-[10px] text-slate-500">ricardo@email.com</p>
+                            </div>
+                        </td>
+                        <td class="p-6 text-center">
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 text-[10px] font-black rounded-full">12 PEDIDOS</span>
+                        </td>
+                        <td class="p-6 text-sm text-slate-500 dark:text-slate-400 font-medium">14/03/2026</td>
+                        <td class="p-6 text-right font-black text-slate-800 dark:text-white">R$ 14.280,50</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // --- LOGICA DE TEMA ---
+    const themeBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        themeIcon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+        location.reload(); // Recarregar para re-renderizar o gráfico com cores do tema se necessário
+    });
+
+    // --- FILTROS DE PERÍODO ---
+    const buttons = document.querySelectorAll('.period-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.className = 'period-btn px-6 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition-all');
+            btn.className = 'period-btn px-6 py-2 text-xs font-black rounded-xl bg-indigo-600 text-white shadow-md transition-all';
+            console.log("Filtrando por:", btn.dataset.period);
+            // Aqui você chamaria sua função de fetch API
+        });
+    });
+
+    // --- GRÁFICO ---
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    const isDarkMode = document.documentElement.classList.contains('dark');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+            datasets: [{
+                label: 'Receita',
+                data: [12500, 18400, 14000, 22000, 28000, 35000, 31000],
+                borderColor: '#6366f1',
+                borderWidth: 4,
+                pointBackgroundColor: '#6366f1',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                tension: 0.4,
+                fill: true,
+                backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.05)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    grid: { color: isDarkMode ? '#1e293b' : '#f1f5f9' },
+                    ticks: { color: '#94a3b8', font: { size: 10 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8', font: { size: 10 } }
+                }
+            }
+        }
+    });
+
+    // --- INICIAIS ---
+    const userInfo = typeof AuthUtils !== 'undefined' ? AuthUtils.getUserInfo() : null;
+    if (userInfo && userInfo.name) {
+        document.getElementById('adminInitial').textContent = userInfo.name.charAt(0).toUpperCase();
+    }
+</script>
+</body>
+</html>

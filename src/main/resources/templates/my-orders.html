@@ -188,7 +188,7 @@
 
         try {
             // Chamada para API (Ajuste de página para 0-based se necessário no back)
-            const response = await AuthUtils.authenticatedFetch(`/api/sales/${userInfo.id}?page=${page}&size=${itemsPerPage}`);
+            const response = await AuthUtils.authenticatedFetch(`/api/sales/${userInfo.id}?page=${page - 1}&size=${itemsPerPage}`);
 
             if (response.status === 401) {
                 AuthUtils.logout();

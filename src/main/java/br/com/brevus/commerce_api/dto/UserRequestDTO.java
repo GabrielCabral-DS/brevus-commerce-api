@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -31,6 +32,7 @@ public record UserRequestDTO(
 
         @NotNull(message = "A data de nascimento é obrigatória")
         @Past(message = "A data de nascimento deve ser uma data passada")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate dateBirth,
 
         @PastOrPresent(message = "A data de registro não pode estar no futuro")

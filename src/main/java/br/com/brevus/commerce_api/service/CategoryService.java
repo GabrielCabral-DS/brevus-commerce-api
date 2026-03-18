@@ -2,6 +2,7 @@ package br.com.brevus.commerce_api.service;
 
 import br.com.brevus.commerce_api.dto.CategoryReponseDTO;
 import br.com.brevus.commerce_api.dto.CategoryRequestDTO;
+import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.mapper.CategoryMapper;
 import br.com.brevus.commerce_api.model.Category;
 import br.com.brevus.commerce_api.repository.CategoryRepository;
@@ -32,14 +33,14 @@ public class CategoryService {
 
     public Category update(UUID id, CategoryRequestDTO dto){
         Category category = categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(()-> new ResourceNotFoundException("Categoria não encontrada"));
         category.setName(dto.name());
         return categoryRepository.save(category);
     }
 
     public void delete(UUID id){
         Category category = categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(()-> new ResourceNotFoundException("Categoria não encontrada"));
         categoryRepository.delete(category);
     }
 }

@@ -92,6 +92,12 @@
 			<groupId>br.com.efipay.efisdk</groupId>
 			<artifactId>sdk-java-apis-efi</artifactId>
 			<version>${efi.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-all</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

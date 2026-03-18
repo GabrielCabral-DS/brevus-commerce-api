@@ -44,7 +44,8 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/pix/**",
+                                "/api/pix/webhook",
+                                "/api/pix/search/{txId}",
                                 "/login",
                                 "/api/web/**",
                                 "/api/users/reset-password",

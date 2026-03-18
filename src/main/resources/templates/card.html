@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Cartão | Brevus Commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.11.2/jquery.mask.min.js"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased min-h-screen">
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+    <form id="formulario_pagamento" th:action="@{/api/sales/confirmar-pagamento}" method="POST">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <div class="lg:col-span-8 space-y-6">
+
+                <section class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                        <i data-lucide="user" class="text-blue-600 w-5 h-5"></i> Dados do Pagador
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nome Completo</label>
+                            <input type="text" name="nome_cliente" th:value="${cliente.nome}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 ring-blue-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">CPF</label>
+                            <input type="text" name="cpf" id="cpf" th:value="${cliente.cpf}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 ring-blue-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">E-mail</label>
+                            <input type="email" name="email" th:value="${cliente.email}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Telefone</label>
+                            <input type="text" name="telefone" id="telefone" th:value="${cliente.telefone}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nascimento</label>
+                            <input type="text" name="nascimento" id="nascimento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                        <i data-lucide="map-pin" class="text-blue-600 w-5 h-5"></i> Endereço de Cobrança
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                        <div class="md:col-span-3">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Rua/Logradouro</label>
+                            <input type="text" name="rua" th:value="${endereco.rua}" placeholder="Avenida Juscelino Kubitschek" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 ring-blue-500 transition-all">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Número</label>
+                            <input type="text" name="numero" th:value="${endereco.numero}" placeholder="909" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Bairro</label>
+                            <input type="text" name="bairro" th:value="${endereco.bairro}" placeholder="Bauxita" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">CEP</label>
+                            <input type="text" name="cep" id="cep" th:value="${endereco.cep}" placeholder="35400000" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Cidade</label>
+                            <input type="text" name="cidade" th:value="${endereco.cidade}" placeholder="Ouro Preto" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Estado</label>
+                            <select name="estado" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none appearance-none cursor-pointer">
+                                <option value="MG" th:selected="${endereco.estado == 'MG'}">Minas Gerais</option>
+                                <option value="SP" th:selected="${endereco.estado == 'SP'}">São Paulo</option>
+                                <option value="RJ" th:selected="${endereco.estado == 'RJ'}">Rio de Janeiro</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm ring-2 ring-blue-500/20">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                        <i data-lucide="credit-card" class="text-blue-600 w-5 h-5"></i> Pagamento
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-3">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Número do Cartão</label>
+                            <input type="text" id="numero_cartao" name="numero_cartao" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none font-mono text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Bandeira</label>
+                            <select id="bandeira" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none appearance-none cursor-pointer">
+                                <option value="visa">Visa</option>
+                                <option value="mastercard">MasterCard</option>
+                                <option value="elo">Elo</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Mês</label>
+                                <select name="mes_vencimento" id="mes_vencimento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                                    <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${#numbers.formatInteger(m,2)}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Ano</label>
+                                <select name="ano_vencimento" id="ano_vencimento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
+                                    <option th:each="a : ${#numbers.sequence(2025, 2035)}" th:value="${a}" th:text="${a}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Código CVV</label>
+                            <input type="text" id="codigo_seguranca" name="codigo_seguranca" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none" placeholder="123">
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="payment_token" id="payment_token">
+                    <input type="hidden" name="parcelas" id="parcelas">
+                </section>
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sticky top-8 shadow-sm">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 italic">Resumo</h3>
+
+                    <div class="space-y-4 mb-8">
+                        <div th:each="item : ${venda.items}" class="flex justify-between items-center text-sm">
+                            <span class="text-slate-600 dark:text-slate-400" th:text="${item.productName + ' x' + item.quantity}"></span>
+                            <span class="font-bold" th:text="${'R$ ' + #numbers.formatDecimal(item.subtotal, 1, 2, 'COMMA')}"></span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 dark:border-slate-800 pt-6 mb-8">
+                        <div class="flex justify-between items-end">
+                            <span class="text-xs font-medium text-slate-500">Total à vista</span>
+                            <span class="text-3xl font-black text-blue-600" th:text="${'R$ ' + #numbers.formatDecimal(venda.total, 1, 2, 'COMMA')}"></span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button type="button" id="ver_parcelas" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">
+                            Selecionar Parcelas
+                        </button>
+                        <button type="submit" id="confirmar_pagamento" disabled class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-600/20 transition-all uppercase tracking-widest text-sm">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<div id="modal_parcelas" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-8 shadow-2xl">
+        <h2 class="text-xl font-bold mb-2">Opções de Parcelamento</h2>
+        <p class="text-sm text-slate-500 mb-6">Escolha a melhor condição para você:</p>
+
+        <select id="opcoes_parcelas" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 outline-none mb-8 cursor-pointer font-medium">
+        </select>
+
+        <div class="flex gap-3">
+            <button type="button" onclick="document.getElementById('modal_parcelas').classList.add('hidden')" class="flex-1 py-3 font-bold text-slate-500">Cancelar</button>
+            <button type="button" id="definir_parcelas" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    // Funções para controle do Modal Tailwind
+    const modalParcelas = document.getElementById('modal_parcelas');
+    const openModal = () => modalParcelas.classList.remove('hidden'), modalParcelas.classList.add('flex');
+    const closeModal = () => modalParcelas.classList.add('hidden'), modalParcelas.classList.remove('flex');
+
+    $gn.ready(function (checkout) {
+
+        // Aplicando as máscaras nos inputs
+        $('#cpf').mask('000.000.000-00');
+        $('#nascimento').mask('00/00/0000');
+        $('#cep').mask('00.000-000');
+        $('#numero_cartao').mask('0000 0000 0000 0000');
+        $('#codigo_seguranca').mask('000');
+        $('#telefone').mask('(00) 00000-0000');
+
+        // Lógica de Parcelas
+        $("#ver_parcelas").click(function () {
+            const bandeira = $('#bandeira').val();
+            // Pegamos o valor total do resumo (removendo R$ e convertendo para centavos se necessário pela API)
+            // Certifique-se de que o campo valor_total exista ou use o valor vindo do Thymeleaf
+            const valor_total = parseInt("[[${venda.totalCentavos}]]");
+
+            if (bandeira) {
+                checkout.getInstallments(valor_total, bandeira, function (error, response) {
+                    if (error) {
+                        console.error(error);
+                        alert(`Erro: ${error.error_description}`);
+                    } else {
+                        let options = '';
+                        response.data.installments.forEach(item => {
+                            options += `<option value="${item.installment}">${item.installment}x de R$ ${item.currency} ${item.has_interest ? '' : '(Sem Juros)'}</option>`;
+                        });
+                        $('#opcoes_parcelas').html(options);
+                        openModal();
+                    }
+                });
+            } else {
+                alert("Selecione a bandeira do cartão primeiro.");
+            }
+        });
+
+        // Confirmar escolha de parcelas no Modal
+        $('#definir_parcelas').click(function () {
+            const select = $('#opcoes_parcelas option:selected');
+            if (select.val()) {
+                $('#parcelas').val(select.val());
+
+                // Atualiza o visual do botão no Tailwind
+                $('#ver_parcelas')
+                    .html(`<i data-lucide="check" class="w-4 h-4"></i> ${select.text()}`)
+                    .addClass('bg-green-100 text-green-700 border-green-200')
+                    .removeClass('bg-slate-100 dark:bg-slate-800');
+
+                // Habilita o botão de finalizar
+                $('#confirmar_pagamento')
+                    .removeAttr('disabled')
+                    .removeClass('opacity-50 cursor-not-allowed');
+
+                lucide.createIcons();
+                closeModal();
+            }
+        });
+
+        // Processar Pagamento e Gerar Token
+        $('#formulario_pagamento').on('submit', function (e) {
+            e.preventDefault(); // Impede o envio imediato para gerar o token antes
+
+            const btnFinalizar = $('#confirmar_pagamento');
+            btnFinalizar.html('Processando...').attr('disabled', 'disabled');
+
+            checkout.getPaymentToken({
+                brand: $('#bandeira').val(),
+                number: $('#numero_cartao').val().replace(/\s/g, ''),
+                cvv: $('#codigo_seguranca').val(),
+                expiration_month: $('#mes_vencimento').val(),
+                expiration_year: $('#ano_vencimento').val()
+            }, function (error, response) {
+                if (error) {
+                    console.error(error);
+                    alert(`Erro ao validar cartão: ${error.error_description}`);
+                    btnFinalizar.html('Finalizar Compra').removeAttr('disabled');
+                } else {
+                    // Sucesso: Setamos o token e enviamos o formulário
+                    $('#payment_token').val(response.data.payment_token);
+
+                    // Desabilitar campos sensíveis antes de enviar (segurança e não enviar dados crus)
+                    $('#numero_cartao, #codigo_seguranca').prop('disabled', true);
+
+                    // Envia o formulário para o seu Controller Spring Boot
+                    e.currentTarget.submit();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

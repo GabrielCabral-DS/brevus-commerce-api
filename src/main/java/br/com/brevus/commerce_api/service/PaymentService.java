@@ -5,6 +5,7 @@ import br.com.brevus.commerce_api.enums.DeliveryStatus;
 import br.com.brevus.commerce_api.enums.PaymentMethod;
 import br.com.brevus.commerce_api.enums.PaymentStatus;
 import br.com.brevus.commerce_api.enums.SaleStatus;
+import br.com.brevus.commerce_api.exceptions.DuplicateRecordException;
 import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.mapper.PaymentMapper;
 import br.com.brevus.commerce_api.model.Payment;
@@ -36,11 +37,11 @@ public class PaymentService {
     public void savePayment(UUID saleId, BigDecimal amount, String txid){
 
         if(paymentRepository.existsBySaleId(saleId)){
-            throw new IllegalStateException("Já existe pagamento cadastrado para esta venda");
+            throw new DuplicateRecordException("Já existe pagamento cadastrado para esta venda");
         }
 
         Sale sale = saleRepository.findById(saleId)
-                .orElseThrow(()-> new ResourceNotFoundException("Sale not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Pedido não encontrada"));
 
         Payment payment = new Payment();
 

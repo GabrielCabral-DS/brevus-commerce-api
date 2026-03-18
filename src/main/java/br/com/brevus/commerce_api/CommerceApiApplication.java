@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api;
 
+import br.com.brevus.commerce_api.efi.card.GerencianetCredentials;
 import br.com.brevus.commerce_api.efi.pix.PixConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
-@EnableConfigurationProperties(PixConfig.class)
+@EnableConfigurationProperties({PixConfig.class, GerencianetCredentials.class})
 @EnableScheduling
 public class CommerceApiApplication {
 

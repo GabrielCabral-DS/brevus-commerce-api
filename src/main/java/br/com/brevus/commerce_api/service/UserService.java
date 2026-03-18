@@ -1,19 +1,19 @@
 package br.com.brevus.commerce_api.service;
 
 import br.com.brevus.commerce_api.dto.*;
-import br.com.brevus.commerce_api.exceptions.BadCredentialsException;
 import br.com.brevus.commerce_api.exceptions.BusinessException;
 import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.mapper.UserMapper;
 import br.com.brevus.commerce_api.model.User;
 import br.com.brevus.commerce_api.repository.UserRepository;
+import br.com.brevus.commerce_api.validation.UserValidation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,24 +25,26 @@ public class UserService {
     private final UserMapper userMapper;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final UserValidation userValidation;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, JwtService jwtService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, JwtService jwtService, PasswordEncoder passwordEncoder, UserValidation userValidation) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.userValidation = userValidation;
     }
 
 
     public UsersResponseDTO getUserById(UUID id){
         User user = userRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado"));
         return userMapper.toDto(user);
     }
 
     public UserRequestDTO getUserByEmail(String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("Email not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Email não encontrado"));
         return userMapper.toDTO(user);
     }
 
@@ -53,40 +55,41 @@ public class UserService {
 
     public User updateUsers(UUID id, UserProfileRequestDTO dto){
         User user = userRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado"));
 
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPhone(dto.phone());
         user.setDateBirth(dto.dateBirth());
 
+        userValidation.validate(user);
         return userRepository.save(user);
     }
 
     public void deleteUserById(UUID id){
         User user = userRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado"));
         userRepository.deleteById(user.getId());
     }
 
     public void passwordRecover(RecoverPasswordEmailRequestDTO dto) {
 
         if (!jwtService.isTokenValid(dto.token())) {
-            throw new RuntimeException("Invalid or expired token");
+            throw new BadCredentialsException("Token inválido ou expirado");
         }
 
         String tokenType = (String) jwtService.getClaim(dto.token(), "type");
         if (!"RECOVER_PASSWORD".equals(tokenType)) {
-            throw new RuntimeException("This token is not for password recovery");
+            throw new BadCredentialsException("Token inválido para recuperação de senha");
         }
 
         String userId = jwtService.getSubject(dto.token());
 
         User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         if (!dto.password().equals(dto.passwordConfirmation())) {
-            throw new RuntimeException("The passwords don't match");
+            throw new BusinessException("As senhas estão divergentes");
         }
 
         user.setPassword(passwordEncoder.encode(dto.password()));

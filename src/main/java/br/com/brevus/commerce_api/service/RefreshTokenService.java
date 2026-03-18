@@ -4,6 +4,7 @@ package br.com.brevus.commerce_api.service;
 import br.com.brevus.commerce_api.model.RefreshToken;
 import br.com.brevus.commerce_api.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,14 +38,14 @@ public class RefreshTokenService {
 
         RefreshToken refreshToken = repository.findByToken(token)
                 .orElseThrow(() ->
-                        new RuntimeException("Refresh token inválido"));
+                        new BadCredentialsException("Refresh token inválido"));
 
         if (refreshToken.isRevoked()) {
-            throw new RuntimeException("Refresh token revogado");
+            throw new BadCredentialsException("Refresh token revogado");
         }
 
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Refresh token expirado");
+            throw new BadCredentialsException("Refresh token expirado");
         }
 
         return refreshToken;

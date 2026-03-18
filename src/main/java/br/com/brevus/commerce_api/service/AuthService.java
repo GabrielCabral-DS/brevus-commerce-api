@@ -4,6 +4,7 @@ import br.com.brevus.commerce_api.dto.JwtResponse;
 import br.com.brevus.commerce_api.dto.LoginRequestDTO;
 import br.com.brevus.commerce_api.dto.RefreshTokenRequestDTO;
 import br.com.brevus.commerce_api.dto.UserRequestDTO;
+import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.model.RefreshToken;
 import br.com.brevus.commerce_api.model.Role;
 import br.com.brevus.commerce_api.model.User;
@@ -12,6 +13,7 @@ import br.com.brevus.commerce_api.repository.RoleRepository;
 import br.com.brevus.commerce_api.repository.UserRepository;
 import br.com.brevus.commerce_api.repository.UserRoleRepository;
 import br.com.brevus.commerce_api.security.CustomUserDetails;
+import br.com.brevus.commerce_api.validation.UserValidation;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,8 +33,9 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
     private final EmailService emailService;
+    private final UserValidation userValidation;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService, RefreshTokenService refreshTokenService, LoginHistoryService loginHistoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserRoleRepository userRoleRepository, EmailService emailService) {
+    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService, RefreshTokenService refreshTokenService, LoginHistoryService loginHistoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, UserRoleRepository userRoleRepository, EmailService emailService, UserValidation userValidation) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
@@ -42,6 +45,7 @@ public class AuthService {
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
         this.emailService = emailService;
+        this.userValidation = userValidation;
     }
 
 
@@ -66,10 +70,6 @@ public class AuthService {
 
     public void registerUser(UserRequestDTO request) {
 
-        if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new RuntimeException("Email already registered");
-        }
-
         User user = new User();
         user.setName(request.name());
         user.setEmail(request.email());
@@ -77,10 +77,11 @@ public class AuthService {
         user.setPhone(request.phone());
 
         user.setPassword(passwordEncoder.encode(request.password()));
+        userValidation.validate(user);
         userRepository.save(user);
 
         Role role = roleRepository.findByName("CLIENT")
-                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         UserRole userRole = new UserRole(user, role);
         userRoleRepository.save(userRole);
@@ -105,7 +106,7 @@ public class AuthService {
 
     public void sendRecoveryEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o email informado"));
 
         String recoveryToken = jwtService.generateRecoveryToken(user);
 

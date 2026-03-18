@@ -5,6 +5,7 @@ import br.com.brevus.commerce_api.dto.SaleRequestDTO;
 import br.com.brevus.commerce_api.dto.SaleResponseDTO;
 import br.com.brevus.commerce_api.enums.DeliveryStatus;
 import br.com.brevus.commerce_api.enums.SaleStatus;
+import br.com.brevus.commerce_api.exceptions.BusinessException;
 import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.mapper.SaleMapper;
 import br.com.brevus.commerce_api.model.*;
@@ -110,7 +111,7 @@ public class SaleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada"));
 
         if(!sale.getDeliveryCode().equals(code)){
-            throw new RuntimeException("Código de entrega inválido");
+            throw new BusinessException("Código de entrega inválido");
         }
 
         sale.setDeliveryStatus(DeliveryStatus.ENTREGUE);

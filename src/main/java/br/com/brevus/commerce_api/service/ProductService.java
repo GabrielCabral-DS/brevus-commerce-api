@@ -3,6 +3,7 @@ package br.com.brevus.commerce_api.service;
 import br.com.brevus.commerce_api.dto.ProductRequestDTO;
 import br.com.brevus.commerce_api.dto.ProductResponseDTO;
 import br.com.brevus.commerce_api.dto.UsersResponseDTO;
+import br.com.brevus.commerce_api.exceptions.ResourceNotFoundException;
 import br.com.brevus.commerce_api.mapper.ProductMapper;
 import br.com.brevus.commerce_api.model.Category;
 import br.com.brevus.commerce_api.model.Product;
@@ -35,7 +36,7 @@ public class ProductService {
         Product product = productMapper.toEntity(dto);
 
         Category category = categoryRepository.findById(dto.categoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada!"));
 
         product.setCategory(category);
 
@@ -60,10 +61,10 @@ public class ProductService {
 
     public Product update(UUID id, ProductRequestDTO dto) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
         Category category = categoryRepository.findById(dto.categoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada!"));
 
         product.setName(dto.name());
         product.setPrice(dto.price());
@@ -78,7 +79,7 @@ public class ProductService {
 
     public void delete(UUID id){
         Product product = productRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Product not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Produto não encontrado"));
         productRepository.delete(product);
     }
 

@@ -35,7 +35,7 @@ public class AddressService {
         Address address = addressMapper.toEntity(dto);
 
         User userClient =  userRepository.findById(dto.userId())
-                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado"));
 
         address.setUser(userClient);
         return addressRepository.save(address);
@@ -54,10 +54,10 @@ public class AddressService {
 
     public Address updateAddress(UUID id, AddressRequestDTO dto){
         Address address = addressRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Address not found for id"));
+                .orElseThrow(()-> new ResourceNotFoundException("Endereço não encontrado para o id informado"));
 
         User userClient =  userRepository.findById(dto.userId())
-                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Usuário não encontrado"));
 
         address.setStreet(dto.street());
         address.setNumber(dto.number());
@@ -75,11 +75,11 @@ public class AddressService {
     public void deleteAddressById(UUID id){
 
         if (saleRepository.existsByDeliveryAddressId(id)) {
-            throw new BusinessException("Cannot delete address because it is associated with a sale.");
+            throw new BusinessException("Não é possível excluir este endereço, pois ele está associado a uma venda.");
         }
 
         Address address = addressRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Address not found for id"));
+                .orElseThrow(()-> new ResourceNotFoundException("Endereço não encontrado para o id informado"));
         addressRepository.delete(address);
     }
 }

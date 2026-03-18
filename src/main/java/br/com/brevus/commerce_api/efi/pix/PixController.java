@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ public class PixController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
     @Operation(summary = "Payment", description = "Create Qr code by pix")
     public ResponseEntity<String> criarQrCode(@RequestBody PixRequestPayload pixRequestPayload){  //https://pix.sejaefi.com.br/cob/pagar/
         var response = this.pixService.criarQrCode(pixRequestPayload);
@@ -43,6 +45,7 @@ public class PixController {
     }
 
     @PostMapping("/configure-webhook")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Configure", description = "Configure webhook")
     public ResponseEntity<String> configurarWebhook() {
         try {
@@ -53,19 +56,6 @@ public class PixController {
             return ResponseEntity.status(500).body("Erro ao configurar webhook: " + e.getMessage());
         }
     }
-
-    /*@PostMapping("/webhook-pix")
-    public ResponseEntity<String> receberWebhook(@RequestBody String payload,
-                                                 @RequestParam(value = "hmac", required = false) String hmac) {
-        // Aqui você pode validar o HMAC, se quiser
-        System.out.println("Webhook recebido (HMAC=" + hmac + "): " + payload);
-
-        // Retorne 200 OK para a Efí saber que recebeu
-        return ResponseEntity.ok("Webhook processado com sucesso");
-    }
-
-     */
-
 
     @PostMapping("/webhook")
     @Operation(summary = "Receber", description = "Receber Webhook.")
@@ -157,6 +147,7 @@ public class PixController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "List", description = "List key Pix.")
     public ResponseEntity<String> listarChavesPix(){
         var response = this.pixService.listarChavesPix();
@@ -164,6 +155,7 @@ public class PixController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Register", description = "Register a new key pix.")
     public ResponseEntity<String> criarChavePix(){
         var response = this.pixService.criarChavePix();
@@ -178,6 +170,7 @@ public class PixController {
     }
 
     @GetMapping("/search-webhook/{key}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Search", description = "Search Webhook.")
     public ResponseEntity<String> searchWebhookToKey(@PathVariable(value = "key") String key) {
         JSONObject response = pixService.consultarWebhook(key);
@@ -185,6 +178,7 @@ public class PixController {
     }
 
     @GetMapping("/list-webhook")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "List", description = "List Webhook.")
     public ResponseEntity<String> listWebhook() {
         JSONObject response = pixService.listarWebhooks();
@@ -192,6 +186,7 @@ public class PixController {
     }
 
     @DeleteMapping("/delete-webhook/{key}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete", description = "Delete Webhook.")
     public ResponseEntity<Void> deleteWebhook(@PathVariable(value = "key") String key) {
         pixService.deletarWebhook(key);
@@ -199,6 +194,7 @@ public class PixController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete", description = "Delete key pix")
     public ResponseEntity<String> deletarChavePix(@RequestParam("chavePix") String chavePix) {
         var response = this.pixService.deletarChavePix(chavePix);

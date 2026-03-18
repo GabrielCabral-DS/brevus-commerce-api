@@ -5,10 +5,13 @@ import br.com.brevus.commerce_api.dto.SaleRequestDTO;
 import br.com.brevus.commerce_api.dto.SaleResponseDTO;
 import br.com.brevus.commerce_api.model.Sale;
 import br.com.brevus.commerce_api.service.SaleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,6 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/sales")
+@Tag(name = "Sales")
 public class SaleController {
 
     private final SaleService saleService;
@@ -29,6 +33,8 @@ public class SaleController {
 
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CLIENT')")
+    @Operation(summary = "Register", description = "Register a new sale")
     public ResponseEntity<Map<String, UUID>> registerSale(@Valid @RequestBody SaleRequestDTO dto){
         Sale sale = saleService.register(dto);
         Map<String, UUID> response = new HashMap<>();
@@ -37,12 +43,16 @@ public class SaleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "List", description = "List all sales")
     public ResponseEntity<List<SaleResponseDTO>> listAllSales(){
         List<SaleResponseDTO> saleResponseDTOList = saleService.listAllSales();
         return ResponseEntity.ok().body(saleResponseDTOList);
     }
 
     @GetMapping("/{clientId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER', 'CLIENT')")
+    @Operation(summary = "List by Client", description = "List all sales by client id with pagination")
     public ResponseEntity<Map<String, Object>> listSalesByClientId(
             @PathVariable UUID clientId,
             @RequestParam(defaultValue = "0") int page,

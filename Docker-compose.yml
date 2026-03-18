@@ -17,6 +17,7 @@ services:
 
   commerce-api:
     build: .
+    image: commerce_api_image:latest
     container_name: commerce_api
     restart: always
     depends_on:

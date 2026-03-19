@@ -95,7 +95,7 @@ Maven	            ->      Build
 GitHub Actions	  ->      CI/CD
 
 ### 🗃️ Arquitetura do Banco de Dados
-[<img alt="Modelo-ER" src="https://lh3.googleusercontent.com/pw/AP1GczOJ0Yh48RvyFyPTkmmgRv3qPRlQAL6WNPotdmBe8lxCQTjVjFhXnQ2jthnu80_pycT1rPeYt4E3MHWMCXkn5wYLrU3pGGqLYJc9GEmgB2ca5M9sp-XNXPwpKQWinqCvOJADCGdVz6NFOlqW7xBPJUYf=w945-h945-s-no-gm?authuser=0"/>](SpringBoot)
+[<img alt="Modelo-ER" src="https://lh3.googleusercontent.com/pw/AP1GczNWMlvCK6Pr0hDLelbGxI2Ejbu4vvAHzTo52XK7f7TPUjwz8NiAtmx_xjkVji7iOUPuWOo3K50GSghWDt4Mx3o5wi7wkPP2uZC4vTbGxExY-YKOCJVZEGZ3aHTBeRsY1fSiqrc3TuDMTwzCbam3flmI=w649-h960-s-no?authuser=1"/>](SpringBoot)
 
 ---
 ### ✅ Testes Automatizados CI/CD GitHub Actions!

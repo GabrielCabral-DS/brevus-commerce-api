@@ -10,7 +10,6 @@ O sistema simula um ambiente de vendas profissional, unindo uma arquitetura robu
 - CLIENT: Acesso limitado, apenas para compra de produtos
 - SELLER: Acesso limitado, para gerenciar
 
-:large_blue_circle: [Linkedin](https://www.linkedin.com/in/gabriel-cabral-878482262/)
 
 ### ⚙️ Funcionalidades
 
@@ -121,7 +120,7 @@ O sistema simula um ambiente de vendas profissional, unindo uma arquitetura robu
 
 1 - Clone o repositório:
 
-- git clone https://github.com/seu-usuario/brevus-commerce.git
+- git clone https://github.com/GabrielCabral-DS/brevus-commerce-api.git
 
 2 - Configure as Credenciais:
 
@@ -138,3 +137,6 @@ O sistema simula um ambiente de vendas profissional, unindo uma arquitetura robu
 
 - Dashboard: http://localhost:8080/login
 - Swagger: http://localhost:8080/swagger-ui.html
+---
+
+🔗 Conecte-se comigo: :large_blue_circle: [Linkedin](https://www.linkedin.com/in/gabriel-cabral-878482262/)

@@ -10,6 +10,7 @@ import br.com.brevus.commerce_api.model.Product;
 import br.com.brevus.commerce_api.model.User;
 import br.com.brevus.commerce_api.repository.CategoryRepository;
 import br.com.brevus.commerce_api.repository.ProductRepository;
+import br.com.brevus.commerce_api.validation.ProductValidation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,11 +26,13 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
+    private final ProductValidation productValidation;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, CategoryRepository categoryRepository, ProductValidation productValidation) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.categoryRepository = categoryRepository;
+        this.productValidation = productValidation;
     }
 
     public Product register(ProductRequestDTO dto) {
@@ -39,7 +42,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada!"));
 
         product.setCategory(category);
-
+        productValidation.validate(product);
         return productRepository.save(product);
     }
 
@@ -73,7 +76,7 @@ public class ProductService {
         product.setDescription(dto.description());
         product.setCategory(category);
 
-
+        productValidation.validate(product);
         return productRepository.save(product);
     }
 

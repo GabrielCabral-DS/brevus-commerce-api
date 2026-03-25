@@ -418,9 +418,7 @@ async function loadAddresses() {
                     throw new Error("Erro ao gerar QR Code PIX");
                 }
             } else {
-                // Redirecionar para página de pagamento com cartão
-                localStorage.removeItem('brevus_cart');
-                window.location.href = `/api/web/payment?saleId=${saleId}`;
+                window.location.href = `/api/web/card?saleId=${saleId}`;
             }
 
         } catch (error) {

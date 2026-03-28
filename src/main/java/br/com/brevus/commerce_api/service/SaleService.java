@@ -132,7 +132,7 @@ public class SaleService {
         return salePage.map(saleMapper::toResponseDto);
     }
 
-    @Scheduled(cron = "0 30 23 * * ?")
+    @Scheduled(cron = "0 0 */4 * * ?", zone = "America/Sao_Paulo")
     @Transactional
     public void deleteSaleExpired(){
         saleRepository.deleteExpiredSales(

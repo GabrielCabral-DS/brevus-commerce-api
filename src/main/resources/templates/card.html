@@ -400,7 +400,17 @@
                 cpf: document.getElementById('cpf').value.replace(/\D/g, ''),
                 email: document.getElementById('email').value,
                 phone_number: document.getElementById('telefone').value.replace(/\D/g, ''),
-                birth: document.getElementById('nascimento').value,
+                birth: (() => {
+                    const nascimento = document.getElementById('nascimento').value;
+                    const parts = nascimento.split('/');
+                    if (parts.length === 3) {
+                        const day = parts[0].padStart(2, '0');
+                        const month = parts[1].padStart(2, '0');
+                        const year = parts[2];
+                        return `${year}-${month}-${day}`;
+                    }
+                    return nascimento;
+                })(),
                 address: billingAddress
             };
 
@@ -509,3 +519,4 @@
 </body>
 
 </html>
+

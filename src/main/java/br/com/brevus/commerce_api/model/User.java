@@ -2,6 +2,7 @@ package br.com.brevus.commerce_api.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private String phone;
 
+    @Column(nullable = false)
+    private String cpf;
+
     @Column(name = "date_birth", nullable = false)
     private LocalDate dateBirth;
 
@@ -49,12 +53,13 @@ public class User {
     public User() {
     }
 
-    public User(UUID id, String name, String email, String password, String phone, LocalDate dateBirth, LocalDate dateRegistered, List<UserRole> userRoles, List<Address> addresses) {
+    public User(UUID id, String name, String email, String password, String phone, String cpf, LocalDate dateBirth, LocalDate dateRegistered, List<UserRole> userRoles, List<Address> addresses) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        this.cpf = cpf;
         this.dateBirth = dateBirth;
         this.dateRegistered = dateRegistered;
         this.userRoles = userRoles;
@@ -99,6 +104,14 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public LocalDate getDateBirth() {

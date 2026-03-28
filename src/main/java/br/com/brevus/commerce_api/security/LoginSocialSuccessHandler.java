@@ -104,10 +104,10 @@ public class LoginSocialSuccessHandler
                 UUID.randomUUID(),
                 oauth2User.getAttribute("name"),
                 oauth2User.getAttribute("email"),
+                "00000000000",
                 UUID.randomUUID().toString(),
                 "(00) 00000-0000",
-                LocalDate.parse("22/02/1990", formatter),
-                LocalDate.parse("20/02/2026", formatter)
+                LocalDate.parse("22/02/1990", formatter)
 
         );
 

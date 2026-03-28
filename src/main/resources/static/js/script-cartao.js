@@ -1,4 +1,3 @@
-
 $gn.ready(function (checkout) {
 
     //Aplicando as mascaras nos inputs do formulário
@@ -99,6 +98,12 @@ $gn.ready(function (checkout) {
                     // Trata a resposta
                     console.log(response);
 
+                    if (!response.data || !response.data.payment_token) {
+                        console.error('Erro ao obter payment_token:', response);
+                        alert('Erro ao gerar token de pagamento. Tente novamente.');
+                        return;
+                    }
+
                     // Desabilitar os botões ver parcelas e confirmar pagamento
                     $('#confirmar_pagamento').addClass('disabled');
                     $('#ver_parcelas').addClass('disabled');
@@ -120,7 +125,8 @@ $gn.ready(function (checkout) {
                     $('#ano_vencimento').prop('disabled', true);
                     $('#codigo_seguranca').prop('disabled', true);
 
-                    $('#formulario_pagamento').submit();
+                    // Enviar o JSON para o backend
+                    window.dispararEnvioBackend(document.getElementById('confirmar_pagamento'));
                 }
             }
             );

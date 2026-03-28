@@ -3,6 +3,7 @@ package br.com.brevus.commerce_api.model;
 import br.com.brevus.commerce_api.enums.MovementType;
 import br.com.brevus.commerce_api.enums.ReferenceType;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

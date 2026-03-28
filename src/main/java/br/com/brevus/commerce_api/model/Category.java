@@ -1,10 +1,13 @@
 package br.com.brevus.commerce_api.model;
 
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Table(name = "categories")

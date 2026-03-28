@@ -18,6 +18,10 @@ public record UserRequestDTO(
         @Email(message = "Formato de e-mail inválido")
         String email,
 
+        @NotBlank(message = "O CPF é obrigatório.")
+        @CPF(message = "O cpf informado é inválido.")
+        String cpf,
+
         @NotBlank(message = "A senha é obrigatória")
         @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres")
         @Pattern(
@@ -33,10 +37,7 @@ public record UserRequestDTO(
         @NotNull(message = "A data de nascimento é obrigatória")
         @Past(message = "A data de nascimento deve ser uma data passada")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate dateBirth,
-
-        @PastOrPresent(message = "A data de registro não pode estar no futuro")
-        LocalDate dateRegistered
+        LocalDate dateBirth
 
 ) {
 }

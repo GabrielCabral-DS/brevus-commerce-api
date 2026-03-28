@@ -1,274 +1,522 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" class="light">
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout Cartão | Brevus Commerce</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/js/auth-utils.js"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (!AuthUtils.isAuthenticated() || !AuthUtils.hasRole('CLIENT')) {
+            window.location.href = '/api/web/login';
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- CDN JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.11.2/jquery.mask.min.js"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
+
+    <!-- Efí API Script -->
+    <script type='text/javascript'>var s=document.createElement('script');s.type='text/javascript';var v=parseInt(Math.random()*1000000);s.src='https://cobrancas-h.api.efipay.com.br/v1/cdn/e8f7d89a845f165a72993d09585b4e5d/'+v;s.async=false;s.id='e8f7d89a845f165a72993d09585b4e5d';if(!document.getElementById('e8f7d89a845f165a72993d09585b4e5d')){document.getElementsByTagName('head')[0].appendChild(s);};$gn={validForm:true,processed:false,done:{},ready:function(fn){$gn.done=fn;}};</script>
+
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased min-h-screen">
 
-<main class="max-w-6xl mx-auto px-4 py-12">
-    <form id="formulario_pagamento" th:action="@{/api/sales/confirmar-pagamento}" method="POST">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col transition-colors duration-300">
 
-            <div class="lg:col-span-8 space-y-6">
-
-                <section class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                        <i data-lucide="user" class="text-blue-600 w-5 h-5"></i> Dados do Pagador
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nome Completo</label>
-                            <input type="text" name="nome_cliente" th:value="${cliente.nome}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 ring-blue-500 transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">CPF</label>
-                            <input type="text" name="cpf" id="cpf" th:value="${cliente.cpf}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 ring-blue-500 transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">E-mail</label>
-                            <input type="email" name="email" th:value="${cliente.email}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none font-medium">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Telefone</label>
-                            <input type="text" name="telefone" id="telefone" th:value="${cliente.telefone}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nascimento</label>
-                            <input type="text" name="nascimento" id="nascimento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                        </div>
-                    </div>
-                </section>
-
-                <section class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                        <i data-lucide="map-pin" class="text-blue-600 w-5 h-5"></i> Endereço de Cobrança
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                        <div class="md:col-span-3">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Rua/Logradouro</label>
-                            <input type="text" name="rua" th:value="${endereco.rua}" placeholder="Avenida Juscelino Kubitschek" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 ring-blue-500 transition-all">
-                        </div>
-                        <div class="md:col-span-1">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Número</label>
-                            <input type="text" name="numero" th:value="${endereco.numero}" placeholder="909" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Bairro</label>
-                            <input type="text" name="bairro" th:value="${endereco.bairro}" placeholder="Bauxita" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">CEP</label>
-                            <input type="text" name="cep" id="cep" th:value="${endereco.cep}" placeholder="35400000" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Cidade</label>
-                            <input type="text" name="cidade" th:value="${endereco.cidade}" placeholder="Ouro Preto" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Estado</label>
-                            <select name="estado" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none appearance-none cursor-pointer">
-                                <option value="MG" th:selected="${endereco.estado == 'MG'}">Minas Gerais</option>
-                                <option value="SP" th:selected="${endereco.estado == 'SP'}">São Paulo</option>
-                                <option value="RJ" th:selected="${endereco.estado == 'RJ'}">Rio de Janeiro</option>
-                            </select>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm ring-2 ring-blue-500/20">
-                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                        <i data-lucide="credit-card" class="text-blue-600 w-5 h-5"></i> Pagamento
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="md:col-span-3">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Número do Cartão</label>
-                            <input type="text" id="numero_cartao" name="numero_cartao" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none font-mono text-lg">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Bandeira</label>
-                            <select id="bandeira" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none appearance-none cursor-pointer">
-                                <option value="visa">Visa</option>
-                                <option value="mastercard">MasterCard</option>
-                                <option value="elo">Elo</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2 grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Mês</label>
-                                <select name="mes_vencimento" id="mes_vencimento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                                    <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}" th:text="${#numbers.formatInteger(m,2)}"></option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Ano</label>
-                                <select name="ano_vencimento" id="ano_vencimento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none">
-                                    <option th:each="a : ${#numbers.sequence(2025, 2035)}" th:value="${a}" th:text="${a}"></option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Código CVV</label>
-                            <input type="text" id="codigo_seguranca" name="codigo_seguranca" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 outline-none" placeholder="123">
-                        </div>
-                    </div>
-
-                    <input type="hidden" name="payment_token" id="payment_token">
-                    <input type="hidden" name="parcelas" id="parcelas">
-                </section>
+    <!-- Header -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-800 dark:text-white">Checkout <span class="text-indigo-600">Cartão</span></span>
             </div>
+            <button id="theme-toggle" class="p-2 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700">
+                <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
+                <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
+            </button>
+        </div>
+    </header>
 
-            <div class="lg:col-span-4 space-y-6">
-                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sticky top-8 shadow-sm">
-                    <h3 class="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 italic">Resumo</h3>
+    <main class="flex-1">
+        <form id="formulario_pagamento"  class="max-w-6xl mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                    <div class="space-y-4 mb-8">
-                        <div th:each="item : ${venda.items}" class="flex justify-between items-center text-sm">
-                            <span class="text-slate-600 dark:text-slate-400" th:text="${item.productName + ' x' + item.quantity}"></span>
-                            <span class="font-bold" th:text="${'R$ ' + #numbers.formatDecimal(item.subtotal, 1, 2, 'COMMA')}"></span>
+                <!-- Resumo do Pedido -->
+                <div class="lg:col-span-1 lg:order-last">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 sticky top-28">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-white">Seu Pedido</h3>
+                            <span id="badge_itens" class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">0 itens</span>
+                        </div>
+
+                        <div id="lista_itens_resumo" class="space-y-4 border-b border-slate-200 dark:border-slate-700 pb-4">
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 mt-4">
+                            <p class="font-bold text-slate-800 dark:text-white">Total</p>
+                            <p id="valor_total_texto" class="text-2xl font-black text-indigo-600">R$ 0,00</p>
+                            <input type="hidden" name="valor_total" id="valor_total" value="0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulário de Pagamento -->
+                <div class="lg:col-span-2">
+                    <!-- Dados Pessoais -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">Dados Pessoais</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label for="nome_cliente" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Nome Completo</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="nome_cliente" id="nome_cliente" value="Gorbadoc Oldbuck" required>
+                            </div>
+
+                            <div>
+                                <label for="cpf" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">CPF</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="cpf" id="cpf" value="94271564656" required>
+                            </div>
+
+                            <div>
+                                <label for="email" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">E-mail</label>
+                                <input type="email" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="email" id="email" value="email_do_cliente@servidor.com.br" required>
+                            </div>
+
+                            <div>
+                                <label for="telefone" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Telefone</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="telefone" id="telefone" value="5144916523" required>
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label for="nascimento" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Data de Nascimento</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="nascimento" id="nascimento" value="29081990" required>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="border-t border-slate-100 dark:border-slate-800 pt-6 mb-8">
-                        <div class="flex justify-between items-end">
-                            <span class="text-xs font-medium text-slate-500">Total à vista</span>
-                            <span class="text-3xl font-black text-blue-600" th:text="${'R$ ' + #numbers.formatDecimal(venda.total, 1, 2, 'COMMA')}"></span>
+                    <!-- Endereço de Cobrança -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">Endereço de Cobrança</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div class="sm:col-span-2">
+                                <label for="rua" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Rua</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="rua" id="rua" value="Avenida Juscelino Kubitschek" required>
+                            </div>
+
+                            <div>
+                                <label for="numero" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Número</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="numero" id="numero" value="909" required>
+                            </div>
+
+                            <div>
+                                <label for="bairro" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Bairro</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="bairro" id="bairro" value="Bauxita" required>
+                            </div>
+
+                            <div>
+                                <label for="cep" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">CEP</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="cep" id="cep" value="35400000" required>
+                            </div>
+
+                            <div>
+                                <label for="cidade" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Cidade</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="cidade" id="cidade" value="Ouro Preto" required>
+                            </div>
+
+                            <div>
+                                <label for="estado" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Estado</label>
+                                <select class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="estado" id="estado" required>
+                                    <option value=""></option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG" selected>Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="space-y-3">
-                        <button type="button" id="ver_parcelas" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">
-                            Selecionar Parcelas
+                    <!-- Informações do Cartão -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">Informações do Cartão</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <div class="sm:col-span-1">
+                                <label for="numero_cartao" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Número do Cartão</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="numero_cartao" id="numero_cartao" value="4012001038443335" required>
+                            </div>
+
+                            <div>
+                                <label for="bandeira" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Bandeira</label>
+                                <select class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" id="bandeira" required>
+                                    <option value=""></option>
+                                    <option value="visa" selected>Visa</option>
+                                    <option value="mastercard">MasterCard</option>
+                                    <option value="amex">Amex</option>
+                                    <option value="elo">Elo</option>
+                                    <option value="hipercard">Hipercard</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="mes_vencimento" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Mês Vencimento</label>
+                                <select class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="mes_vencimento" id="mes_vencimento" required>
+                                    <option></option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option selected>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                    <option>9</option>
+                                    <option>10</option>
+                                    <option>11</option>
+                                    <option>12</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="ano_vencimento" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Ano Vencimento</label>
+                                <select class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="ano_vencimento" id="ano_vencimento" required>
+                                    <option></option>
+                                    <option>2020</option>
+                                    <option>2022</option>
+                                    <option>2023</option>
+                                    <option>2024</option>
+                                    <option selected>2025</option>
+                                    <option>2026</option>
+                                    <option>2027</option>
+                                    <option>2028</option>
+                                    <option>2029</option>
+                                    <option>2030</option>
+                                    <option>2031</option>
+                                    <option>2032</option>
+                                    <option>2033</option>
+                                    <option>2034</option>
+                                    <option>2035</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="codigo_seguranca" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">CVV</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" name="codigo_seguranca" id="codigo_seguranca" value="123" required>
+                            </div>
+                        </div>
+
+                        <div class="hidden">
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white" name="payment_token" id="payment_token" readonly aria-hidden="true">
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white" name="mascara_cartao" id="mascara_cartao" readonly aria-hidden="true">
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white" name="parcelas" id="parcelas" aria-hidden="true">
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button class="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2" id="ver_parcelas" type="button">
+                            <i class="fa-solid fa-credit-card"></i> Definir Parcelas
                         </button>
-                        <button type="submit" id="confirmar_pagamento" disabled class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-600/20 transition-all uppercase tracking-widest text-sm">
-                            Finalizar Compra
+                        <button class="w-full px-6 py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold rounded-lg cursor-not-allowed transition-colors flex items-center justify-center gap-2 disabled" id="confirmar_pagamento" type="button">
+                            <i class="fa-solid fa-check"></i> Confirmar Pagamento
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
-</main>
+        </form>
+    </main>
 
-<div id="modal_parcelas" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-8 shadow-2xl">
-        <h2 class="text-xl font-bold mb-2">Opções de Parcelamento</h2>
-        <p class="text-sm text-slate-500 mb-6">Escolha a melhor condição para você:</p>
+    <!-- Modal de Parcelas -->
+    <div id="modal_parcelas" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-200 dark:border-slate-700 max-w-md w-full shadow-xl">
+            <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Selecione Parcelas</h3>
 
-        <select id="opcoes_parcelas" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4 outline-none mb-8 cursor-pointer font-medium">
-        </select>
+            <div class="mb-6">
+                <label for="opcoes_parcelas" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Escolha como deseja pagar</label>
+                <select class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all" id="opcoes_parcelas" required>
+                </select>
+            </div>
 
-        <div class="flex gap-3">
-            <button type="button" onclick="document.getElementById('modal_parcelas').classList.add('hidden')" class="flex-1 py-3 font-bold text-slate-500">Cancelar</button>
-            <button type="button" id="definir_parcelas" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Confirmar</button>
+            <div class="flex gap-4">
+                <button type="button" id="fechar_modal" class="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-300 font-bold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">Cancelar</button>
+                <button type="button" id="definir_parcelas" class="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors">Confirmar</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    lucide.createIcons();
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-8">
+        <div class="max-w-7xl mx-auto px-4 py-8 text-center">
+            <p class="text-sm text-slate-500 dark:text-slate-400">&copy; 2024 Brevus Commerce. Todos os direitos reservados.</p>
+        </div>
+    </footer>
 
-    // Funções para controle do Modal Tailwind
-    const modalParcelas = document.getElementById('modal_parcelas');
-    const openModal = () => modalParcelas.classList.remove('hidden'), modalParcelas.classList.add('flex');
-    const closeModal = () => modalParcelas.classList.add('hidden'), modalParcelas.classList.remove('flex');
+    <!-- Scripts -->
+    <script src="/js/script-cartao.js"></script>
+    <script>
+        // --- 🌗 CONTROLE DE TEMA (DARK/LIGHT MODE) ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-    $gn.ready(function (checkout) {
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeToggleLightIcon?.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeToggleDarkIcon?.classList.remove('hidden');
+        }
 
-        // Aplicando as máscaras nos inputs
-        $('#cpf').mask('000.000.000-00');
-        $('#nascimento').mask('00/00/0000');
-        $('#cep').mask('00.000-000');
-        $('#numero_cartao').mask('0000 0000 0000 0000');
-        $('#codigo_seguranca').mask('000');
-        $('#telefone').mask('(00) 00000-0000');
-
-        // Lógica de Parcelas
-        $("#ver_parcelas").click(function () {
-            const bandeira = $('#bandeira').val();
-            // Pegamos o valor total do resumo (removendo R$ e convertendo para centavos se necessário pela API)
-            // Certifique-se de que o campo valor_total exista ou use o valor vindo do Thymeleaf
-            const valor_total = parseInt("[[${venda.totalCentavos}]]");
-
-            if (bandeira) {
-                checkout.getInstallments(valor_total, bandeira, function (error, response) {
-                    if (error) {
-                        console.error(error);
-                        alert(`Erro: ${error.error_description}`);
-                    } else {
-                        let options = '';
-                        response.data.installments.forEach(item => {
-                            options += `<option value="${item.installment}">${item.installment}x de R$ ${item.currency} ${item.has_interest ? '' : '(Sem Juros)'}</option>`;
-                        });
-                        $('#opcoes_parcelas').html(options);
-                        openModal();
-                    }
-                });
+        themeToggleBtn?.addEventListener('click', function() {
+            themeToggleDarkIcon?.classList.toggle('hidden');
+            themeToggleLightIcon?.classList.toggle('hidden');
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
             } else {
-                alert("Selecione a bandeira do cartão primeiro.");
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
             }
         });
 
-        // Confirmar escolha de parcelas no Modal
-        $('#definir_parcelas').click(function () {
-            const select = $('#opcoes_parcelas option:selected');
-            if (select.val()) {
-                $('#parcelas').val(select.val());
 
-                // Atualiza o visual do botão no Tailwind
-                $('#ver_parcelas')
-                    .html(`<i data-lucide="check" class="w-4 h-4"></i> ${select.text()}`)
-                    .addClass('bg-green-100 text-green-700 border-green-200')
-                    .removeClass('bg-slate-100 dark:bg-slate-800');
+        // --- 📦 CONTROLE DO MODAL DE PARCELAS ---
+        const modal = document.getElementById('modal_parcelas');
+        const fecharBtn = document.getElementById('fechar_modal');
+        const definirParcelasBtn = document.getElementById('definir_parcelas');
+        const opcoesParcelasSelect = document.getElementById('opcoes_parcelas');
+        const inputParcelasOculto = document.getElementById('parcelas');
+        const btnConfirmarPagamento = document.getElementById('confirmar_pagamento');
 
-                // Habilita o botão de finalizar
-                $('#confirmar_pagamento')
-                    .removeAttr('disabled')
-                    .removeClass('opacity-50 cursor-not-allowed');
+        function abrirModal() {
+            modal?.classList.remove('hidden');
+        }
 
-                lucide.createIcons();
-                closeModal();
-            }
+        function fecharModal() {
+            modal?.classList.add('hidden');
+        }
+
+        fecharBtn?.addEventListener('click', fecharModal);
+
+        modal?.addEventListener('click', function(e) {
+            if (e.target === modal) fecharModal();
         });
 
-        // Processar Pagamento e Gerar Token
-        $('#formulario_pagamento').on('submit', function (e) {
-            e.preventDefault(); // Impede o envio imediato para gerar o token antes
+        definirParcelasBtn?.addEventListener('click', function() {
+            if (opcoesParcelasSelect && inputParcelasOculto) {
+                inputParcelasOculto.value = opcoesParcelasSelect.value;
+                fecharModal();
 
-            const btnFinalizar = $('#confirmar_pagamento');
-            btnFinalizar.html('Processando...').attr('disabled', 'disabled');
-
-            checkout.getPaymentToken({
-                brand: $('#bandeira').val(),
-                number: $('#numero_cartao').val().replace(/\s/g, ''),
-                cvv: $('#codigo_seguranca').val(),
-                expiration_month: $('#mes_vencimento').val(),
-                expiration_year: $('#ano_vencimento').val()
-            }, function (error, response) {
-                if (error) {
-                    console.error(error);
-                    alert(`Erro ao validar cartão: ${error.error_description}`);
-                    btnFinalizar.html('Finalizar Compra').removeAttr('disabled');
-                } else {
-                    // Sucesso: Setamos o token e enviamos o formulário
-                    $('#payment_token').val(response.data.payment_token);
-
-                    // Desabilitar campos sensíveis antes de enviar (segurança e não enviar dados crus)
-                    $('#numero_cartao, #codigo_seguranca').prop('disabled', true);
-
-                    // Envia o formulário para o seu Controller Spring Boot
-                    e.currentTarget.submit();
+                if (btnConfirmarPagamento) {
+                    btnConfirmarPagamento.disabled = false;
+                    btnConfirmarPagamento.classList.remove('cursor-not-allowed', 'bg-slate-300', 'dark:bg-slate-700', 'text-slate-500', 'dark:text-slate-400');
+                    btnConfirmarPagamento.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
                 }
-            });
+            }
         });
-    });
-</script>
+
+        window.abrirModalParcelas = abrirModal;
+        window.fecharModalParcelas = fecharModal;
+
+
+        // --- 💳 FUNÇÃO GLOBAL PARA ENVIAR O JSON (Chamada pelo script-cartao.js) ---
+        window.dispararEnvioBackend = async function(btn) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const saleId = urlParams.get('saleId');
+
+            if (!saleId) {
+                alert("ID da venda não encontrado na URL.");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento';
+                }
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('brevus_cart')) || [];
+            if (cart.length === 0) {
+                alert("Seu carrinho está vazio.");
+                return;
+            }
+
+            const itemsJson = cart.map(item => ({
+                name: item.name,
+                value: Math.round(Number(item.price) * 100), // Converte para centavos (Padrão Efí)
+                amount: item.quantity
+            }));
+
+            const paymentToken = document.getElementById('payment_token').value;
+            const installments = parseInt(document.getElementById('parcelas').value) || 1;
+
+            if (!paymentToken) {
+                alert("Erro: O Token de pagamento da Efí não foi preenchido.");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento';
+                }
+                return;
+            }
+
+            const billingAddress = {
+                street: document.getElementById('rua').value,
+                number: document.getElementById('numero').value,
+                neighborhood: document.getElementById('bairro').value,
+                zipcode: document.getElementById('cep').value.replace(/\D/g, ''),
+                city: document.getElementById('cidade').value,
+                state: document.getElementById('estado').value
+            };
+
+            const customerData = {
+                name: document.getElementById('nome_cliente').value,
+                cpf: document.getElementById('cpf').value.replace(/\D/g, ''),
+                email: document.getElementById('email').value,
+                phone_number: document.getElementById('telefone').value.replace(/\D/g, ''),
+                birth: (() => {
+                    const nascimento = document.getElementById('nascimento').value;
+                    const parts = nascimento.split('/');
+                    if (parts.length === 3) {
+                        const day = parts[0].padStart(2, '0');
+                        const month = parts[1].padStart(2, '0');
+                        const year = parts[2];
+                        return `${year}-${month}-${day}`;
+                    }
+                    return nascimento;
+                })(),
+                address: billingAddress
+            };
+
+            const payloadFinal = {
+                items: itemsJson,
+                payment: {
+                    credit_card: {
+                        payment_token: paymentToken,
+                        installments: installments,
+                        billing_address: billingAddress,
+                        customer: customerData
+                    }
+                },
+                metadata: {
+                    custom_id: saleId
+                }
+            };
+
+
+            try {
+                const response = await AuthUtils.authenticatedFetch('/api/card', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadFinal)
+                });
+
+                if (response.ok) {
+                    localStorage.removeItem('brevus_cart'); // Sucesso! Limpa o carrinho.
+                    window.location.href = `/api/web/success?saleId=${saleId}`;
+                } else {
+                    const errorTxt = await response.text();
+                    throw new Error(errorTxt || "Falha no pagamento com o cartão.");
+                }
+
+            } catch (error) {
+                console.error("Erro no processamento do cartão:", error);
+                alert("Falha ao finalizar pedido: " + error.message);
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento';
+                }
+            }
+        };
+
+
+        // --- 🛒 RENDERIZAÇÃO DINÂMICA DO RESUMO DO PEDIDO ---
+        function renderResumoPedido() {
+            const cart = JSON.parse(localStorage.getItem('brevus_cart')) || [];
+            const containerLista = document.getElementById('lista_itens_resumo');
+            const badgeItens = document.getElementById('badge_itens');
+            const valorTotalTexto = document.getElementById('valor_total_texto');
+            const inputValorTotal = document.getElementById('valor_total');
+
+            if (!containerLista) return;
+
+            if (cart.length === 0) {
+                containerLista.innerHTML = `<p class="text-sm text-slate-500 text-center py-4">Carrinho vazio.</p>`;
+                if (badgeItens) badgeItens.textContent = "0 itens";
+                if (valorTotalTexto) valorTotalTexto.textContent = "R$ 0,00";
+                return;
+            }
+
+            const totalUnidades = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (badgeItens) {
+                badgeItens.textContent = `${totalUnidades} ${totalUnidades === 1 ? 'item' : 'itens'}`;
+            }
+
+            let totalGeral = 0;
+
+            containerLista.innerHTML = cart.map(item => {
+                const precoUnitario = Number(item.price);
+                const subtotal = precoUnitario * item.quantity;
+                totalGeral += subtotal;
+
+                return `
+                    <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700/30 p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.imageUrl || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-md border dark:border-slate-600">
+                            <div>
+                                <p class="font-bold text-slate-800 dark:text-white text-sm">${item.name}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">${item.quantity}x R$ ${precoUnitario.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                            </div>
+                        </div>
+                        <span class="text-slate-700 dark:text-slate-300 font-bold text-sm">R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                `;
+            }).join('');
+
+            if (valorTotalTexto) {
+                valorTotalTexto.textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            }
+
+            if (inputValorTotal) {
+                inputValorTotal.value = Math.round(totalGeral * 100);
+            }
+        }
+
+
+
+        // 🚀 Carrega os itens do Macbook assim que abre
+        document.addEventListener('DOMContentLoaded', () => {
+            renderResumoPedido();
+        });
+    </script>
 </body>
+
 </html>
+

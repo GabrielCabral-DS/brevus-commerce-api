@@ -62,7 +62,7 @@ public class UserServiceTest {
     public void deveBuscarUsuarioPorIdComSucesso() {
         LocalDate dataNasc = LocalDate.of(1995, 5, 20);
         LocalDate dataReg = LocalDate.now();
-        UsersResponseDTO mockDto = new UsersResponseDTO(userId, "Gabriel", "gabriel@brevus.com", "8399999", dataNasc, dataReg);
+        UsersResponseDTO mockDto = new UsersResponseDTO(userId, "Gabriel", "gabriel@brevus.com", "00000000000", "8399999", dataNasc, dataReg);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(mockDto);

@@ -24,4 +24,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
                                    @Param("search") String search,
                                    Pageable pageable);
 
+    Optional<User> findByCpf(String cpf);
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.name = :roleName")
+    long countByRoleName(@Param("roleName") String roleName);
 }

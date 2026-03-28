@@ -1,6 +1,7 @@
 package br.com.brevus.commerce_api.model;
 
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
@@ -18,4 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             @Param("categoryId") UUID categoryId,
             @Param("search") String search,
             Pageable pageable);
+
+    Optional<Product> findByName(String name);
 }

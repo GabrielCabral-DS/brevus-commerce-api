@@ -3,11 +3,14 @@ package br.com.brevus.commerce_api.model;
 import br.com.brevus.commerce_api.enums.DeliveryStatus;
 import br.com.brevus.commerce_api.enums.SaleStatus;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Table(name = "sales")

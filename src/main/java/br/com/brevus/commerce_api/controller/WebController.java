@@ -99,6 +99,11 @@ public class WebController {
         return "pix";
     }
 
+    @GetMapping("/api/web/card")
+    public String cardPage() {
+        return "card";
+    }
+
     @GetMapping("/api/web/sales")
     public String salesPage() {
         return "sales";

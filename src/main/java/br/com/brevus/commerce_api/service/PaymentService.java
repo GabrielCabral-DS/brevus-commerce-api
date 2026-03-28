@@ -1,5 +1,6 @@
 package br.com.brevus.commerce_api.service;
 
+import br.com.brevus.commerce_api.dto.DashboardSummaryResponseDTO;
 import br.com.brevus.commerce_api.dto.PaymentResponseDTO;
 import br.com.brevus.commerce_api.enums.DeliveryStatus;
 import br.com.brevus.commerce_api.enums.PaymentMethod;
@@ -11,7 +12,9 @@ import br.com.brevus.commerce_api.mapper.PaymentMapper;
 import br.com.brevus.commerce_api.model.Payment;
 import br.com.brevus.commerce_api.model.Sale;
 import br.com.brevus.commerce_api.repository.PaymentRepository;
+import br.com.brevus.commerce_api.repository.ProductRepository;
 import br.com.brevus.commerce_api.repository.SaleRepository;
+import br.com.brevus.commerce_api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,11 +27,15 @@ import java.util.UUID;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
     private final SaleRepository saleRepository;
     private final PaymentMapper paymentMapper;
 
-    public PaymentService(PaymentRepository paymentRepository, SaleRepository saleRepository, PaymentMapper paymentMapper) {
+    public PaymentService(PaymentRepository paymentRepository, ProductRepository productRepository, UserRepository userRepository, SaleRepository saleRepository, PaymentMapper paymentMapper) {
         this.paymentRepository = paymentRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
         this.saleRepository = saleRepository;
         this.paymentMapper = paymentMapper;
     }
@@ -88,6 +95,16 @@ public class PaymentService {
                 startOfMonth,
                 endOfMonth
         );
+    }
+
+    public DashboardSummaryResponseDTO getDashboardSummary(){
+
+        BigDecimal Revenue = paymentRepository.sumPaymentsByStatus(PaymentStatus.PAID);
+        long totalProducts = productRepository.count();
+        long totalSales = paymentRepository.countByStatus(PaymentStatus.PAID);
+        long totalClients = userRepository.countByRoleName("CLIENT");
+
+        return new DashboardSummaryResponseDTO(Revenue, totalProducts, totalSales, totalClients);
     }
 
 }

@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/pix/webhook",
                                 "/api/pix/search/{txId}",
+                                "/api/card/**",
                                 "/login",
                                 "/api/web/**",
                                 "/api/users/reset-password",

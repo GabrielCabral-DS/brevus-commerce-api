@@ -54,9 +54,6 @@ public class CardController {
     public ResponseEntity<String> receberWebhook(@RequestBody String payload, HttpServletRequest request) {
 
         try {
-            String ipRemoto = request.getRemoteAddr();
-            logger.info("Webhook recebido do IP: {}", ipRemoto);
-
             String notificationToken = Arrays.stream(payload.split("&"))
                     .filter(s -> s.startsWith("notification="))
                     .map(s -> s.replace("notification=", ""))
@@ -88,16 +85,14 @@ public class CardController {
             if (pagamento != null && pagamento.has("data")) {
                 JSONObject data = pagamento.getJSONObject("data");
 
-                String nome = data.getJSONObject("customer").getString("name");
-                String cpf = data.getJSONObject("customer").getString("cpf");
                 BigDecimal valor = BigDecimal.valueOf(data.getDouble("total") / 100);
                 boolean statusPagamento = "paid".equalsIgnoreCase(data.getString("status"));
 
                 String customId = data.optString("custom_id", null);
-                UUID empresaId = UUID.fromString(customId);
+                UUID saleId = UUID.fromString(customId);
 
                 if (statusPagamento) {
-                    //paymentService.savePayment(chargeId, empresaId, nome, cpf, valor, true);
+                    paymentService.savePayment(saleId, valor, chargeId);
                     logger.info("Pagamento aprovado e salvo no banco.");
                 } else {
                     logger.info("Pagamento NÃO aprovado, nada será salvo.");

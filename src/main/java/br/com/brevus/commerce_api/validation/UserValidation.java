@@ -22,10 +22,24 @@ public class UserValidation {
         if (existsByEmail(user)){
             throw new DuplicateRecordException("Já existe um usuário cadastrado com esse email");
         }
+
+        if (existsByCpf(user)){
+            throw new DuplicateRecordException("Já existe um usuário cadastrado com esse cpf");
+        }
     }
 
     public boolean existsByEmail(User user){
         Optional<User> userOptional = userRepository.findByEmail(user.getEmail());
+
+        if (user.getId() == null){
+            return userOptional.isPresent();
+        }
+
+        return userOptional.isPresent() && !user.getId().equals(userOptional.get().getId());
+    }
+
+    public boolean existsByCpf(User user){
+        Optional<User> userOptional = userRepository.findByCpf(user.getCpf());
 
         if (user.getId() == null){
             return userOptional.isPresent();

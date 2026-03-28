@@ -1,6 +1,7 @@
 package br.com.brevus.commerce_api.controller;
 
 
+import br.com.brevus.commerce_api.dto.DashboardSummaryResponseDTO;
 import br.com.brevus.commerce_api.dto.PaymentResponseDTO;
 import br.com.brevus.commerce_api.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,14 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponseDTO>> listAllPayments(){
         List<PaymentResponseDTO> responseDTOList = paymentService.listAllPayments();
         return ResponseEntity.ok().body(responseDTOList);
+    }
+
+    @GetMapping("/dashboard-summary")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @Operation(summary = "Dashboard Summary", description = "Get a summary of the dashboard with total revenue, total products, total sales and total customers")
+    public ResponseEntity<DashboardSummaryResponseDTO> getDashBoardSummary() {
+        DashboardSummaryResponseDTO summaryResponseDTO = paymentService.getDashboardSummary();
+        return ResponseEntity.ok().body(summaryResponseDTO);
     }
 
     @GetMapping("/recent")

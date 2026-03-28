@@ -8,6 +8,7 @@ public record UsersResponseDTO(
         UUID id,
         String name,
         String email,
+        String cpf,
         String phone,
         LocalDate dateBirth,
         LocalDate dateRegistered

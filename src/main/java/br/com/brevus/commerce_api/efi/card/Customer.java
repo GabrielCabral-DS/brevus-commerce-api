@@ -14,5 +14,7 @@ public class Customer {
     private String phoneNumber;
 
     private String birth;
+
+    @JsonProperty("address")
     private AddressCard addressCard;
 }

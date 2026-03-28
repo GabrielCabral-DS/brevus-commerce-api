@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
@@ -18,14 +19,20 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     List<Payment> findTop10ByStatusOrderByCreatedAtDesc(PaymentStatus status);
 
     @Query("""
-    SELECT COALESCE(SUM(p.amount), 0)
-    FROM Payment p
-    WHERE p.status = :status
-    AND p.createdAt BETWEEN :startDate AND :endDate
-""")
+                SELECT COALESCE(SUM(p.amount), 0)
+                FROM Payment p
+                WHERE p.status = :status
+                AND p.createdAt BETWEEN :startDate AND :endDate
+            """)
     BigDecimal sumPaymentsByStatusAndPeriod(
             @Param("status") PaymentStatus status,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status")
+    BigDecimal sumPaymentsByStatus(@Param("status") PaymentStatus status);
+
+    long countByStatus(PaymentStatus paymentStatus);
 }

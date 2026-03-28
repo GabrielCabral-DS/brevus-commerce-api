@@ -58,10 +58,10 @@ class UserControllerTest {
                 UUID.randomUUID(),
                 "Gabriel Cabral",
                 "gabriel@brevus.com",
+                "51117652041",
                 "Gabriel@123",
                 "83988887777",
-                LocalDate.of(1995, 5, 20),
-                LocalDate.now()
+                LocalDate.of(1995, 5, 20)
         );
 
         mvc.perform(post("/api/users/register-user")
@@ -79,10 +79,10 @@ class UserControllerTest {
                 UUID.randomUUID(),
                 "Gabriel",
                 "gabriel@brevus.com",
+                "51117652041",
                 "Senha@@@123",
                 "83988887777",
-                LocalDate.of(1995, 5, 20),
-                LocalDate.now()
+                LocalDate.of(1995, 5, 20)
         );
 
         mvc.perform(post("/api/users/register-user")
@@ -98,10 +98,10 @@ class UserControllerTest {
                 UUID.randomUUID(),
                 "Gabriel",
                 "gabriel@brevus.com",
+                "51117652041",
                 "Gabriel@123",
                 "83988887777",
-                LocalDate.now().plusDays(1),
-                LocalDate.now()
+                LocalDate.now().plusDays(1)
         );
 
         mvc.perform(post("/api/users/register-user")
@@ -129,7 +129,7 @@ class UserControllerTest {
     @DisplayName("Deve buscar usuário por ID e retornar 200")
     void deveBuscarUsuarioPorId() throws Exception {
         UUID id = UUID.randomUUID();
-        UsersResponseDTO response = new UsersResponseDTO(id, "Gabriel", "gabriel@teste.com", "CLIENT", null, null);
+        UsersResponseDTO response = new UsersResponseDTO(id, "Gabriel", "gabriel@teste.com", "51117652041", "CLIENT", null, null);
 
         when(userService.getUserById(id)).thenReturn(response);
 
@@ -158,10 +158,10 @@ class UserControllerTest {
                 UUID.randomUUID(),
                 "G",
                 "email-invalido",
+                "51117652041",
                 "",
                 "123",
-                LocalDate.now().plusDays(1),
-                LocalDate.now()
+                LocalDate.now().plusDays(1)
         );
 
         mvc.perform(post("/api/users/register-user")
@@ -203,7 +203,7 @@ class UserControllerTest {
     @DisplayName("Deve retornar 200 ao buscar usuários recentes paginados")
     void deveRetornarUsuariosRecentesPaginados() throws Exception {
         Page<UsersResponseDTO> page = new PageImpl<>(List.of(
-                new UsersResponseDTO(UUID.randomUUID(), "Gabriel", "gabriel@teste.com", "ADMIN", null, null)
+                new UsersResponseDTO(UUID.randomUUID(), "Gabriel", "gabriel@teste.com", "51117652041", "ADMIN", null, null)
         ));
 
         when(userService.getRecentUsers(anyInt(), anyInt(), anyString())).thenReturn(page);
